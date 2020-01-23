@@ -1,0 +1,74 @@
+{% load static %}
+{% csrf_token %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="{% static 'texture-mapper/style.css' %}">
+    <meta charset="utf-8">
+    <title>Texture Looper</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.2.0/jszip.min.js"> </script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="{% static 'texture-mapper/jquery-ui-1.12.1.custom/external/jquery/jquery.js' %}"></script>
+    <script src="{% static 'texture-mapper/jquery-ui-1.12.1.custom/jquery-ui.js' %}"></script>
+    <script src="{% static 'texture-mapper/index.js' %}" type="module"></script>
+
+    <script>
+      var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    </script>
+  </head>
+
+  <body>
+    <img id="image-to-crop" src="#" alt="Waiting for you to upload a texture...">
+    <div id="crop-area"></div>
+    <div id="drag-n-drop">
+      <p>Drag and drop image...</p>
+    </div>
+
+    <div class="texture-chooser">
+      <ul id="texture-list">
+        <li>
+          <label for="file-upload">Upload:
+            <input type="file" id="file-upload" accept="image/*">
+          </label>
+          ... or drag and drop
+      </ul>
+    </div>
+
+    <div class="ui">
+      <ol>
+        <li><label for="project-name">Name your project
+            <input id="project-name" type="text" value="TEXTURE">
+          </label>
+          <button id="new-project">New Project</button>
+        </li>
+        <li>
+          <p>Upload some image textures</p>
+          <li>
+            <p>Crop the image to your heart's content, using the interactive tool
+            on the left</p>
+            <label for="show-repeat-preview">
+              <input id="show-repeat-preview" type="checkbox">
+              Show repeat
+            </label>
+          </li>
+          <li>
+            <p>Save your results</p>
+            <form id="upload_form" action='hello' onsubmit="alert('hello')">
+              <table>
+                {{ uploadForm }}
+              </table>
+            </form>
+            <button id="export">Export</button>
+          </li>
+        </li>
+      </ol>
+
+      <div>
+        <p>Normal Map Preview:</p>
+        <img id="normal-map-preview" src="#">
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,72 @@
+{% load static %}
+{% csrf_token %}
+
+<!DOCTYPE html><html lang="en"><head>
+		<title>Glyph Aligner</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <base href="/">
+	<link rel="stylesheet" type="text/css" href="{% static 'glyph-aligner/style.css' %}">
+	</head>
+	<body ondrop="drop(event)" ondragover="allowDrop(event)">
+		<canvas id="c"></canvas>
+
+	<div id="content">
+			<div id="info">ABR Glyph Aligner</div>
+<table>
+  <tr>
+    <td>
+      <div id="forward">Forward Vec = (<input type="text" id="forward_vec_x" name="forward_vec_x" size="10" onchange="updateVec('fx')" readonly="">, <input type="text" id="forward_vec_y" name="forward_vec_y" size="10" onchange="updateVec('fy')" readonly="">, <input type="text" id="forward_vec_z" name="forward_vec_z" size="10" onchange="updateVec('fz')" readonly="">)</div>
+      <div id="up">Up Vec = (<input type="text" id="up_vec_x" name="up_vec_x" size="10" onchange="updateVec('ux')" readonly="">, <input type="text" id="up_vec_y" name="up_vec_y" size="10" onchange="updateVec('uy')" readonly="">, <input type="text" id="up_vec_z" name="up_vec_z" size="10" onchange="updateVec('uz')" readonly="">)
+      <br>
+      <button type="button" onmousedown="rotateAxisPos(); intervalId=setInterval(rotateAxisPos, 30);" onmouseup="clearInterval(intervalId)">Rotate +</button>
+      <button type="button" onmousedown="rotateAxisNeg(); intervalId=setInterval(rotateAxisNeg, 30);" onmouseup="clearInterval(intervalId)">Rotate -</button>
+      <br>
+      <input type="checkbox" id="renderData" name="renderData" checked="true"><label for="renderData">Render Data Preview</label>
+    </td>
+    <td width=50></td>
+    <td>
+      <table>
+	<tr>
+	  <td>Family</td><td><input id="family" type="text" width=200 background-color=red;></td>
+	</tr>
+	<tr>
+	  <td>Class</td><td><input id="clss" type="text" width=200></td>
+	</tr>
+	<tr>
+	  <td colspan="2"><button type="button" onclick="exportToObj()">Export Obj</button><td>
+	</tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+      </div>
+
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+    <script src="{% static 'glyph-aligner/three.min.js' %}"></script>
+    <script src="{% static 'glyph-aligner/OrbitControls.js' %}"></script>
+    <script src="{% static 'glyph-aligner/TrackballControls.js' %}"></script>
+    <script src="{% static 'glyph-aligner/WebGL.js' %}"></script>
+    <script src="{% static 'glyph-aligner/OBJExporter.js' %}"></script>
+    <script src="{% static 'glyph-aligner/PLYExporter.js' %}"></script>
+    <script src="{% static 'glyph-aligner/BufferGeometryUtils.js' %}"></script>
+    <script src="{% static 'glyph-aligner/mesh_simplify.js' %}"></script>
+    <script src="{% static 'glyph-aligner/OBJLoader.js' %}"></script>
+
+    <script>
+      var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    </script>
+
+      
+		<script id="template" type="notjs">
+			<div class="scene"></div>
+			<div class="description">$</div>
+		</script>
+    
+		<script src="{% static 'glyph-aligner/sketch.js' %}"></script>
+
+</body></html>

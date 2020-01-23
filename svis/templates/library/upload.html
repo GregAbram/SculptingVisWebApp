@@ -1,0 +1,45 @@
+{% load static %}
+<html>
+  <head>
+    <script src='{% static "jquery-3.4.1.min.js" %}'></script>
+    <script>
+
+        function SendBlob() {
+          var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+          var fd = new FormData();
+          var content0 = 'the rain in Spain';
+          var blob0 = new Blob([content0], { type: "text"});
+          fd.append("blob0", blob0);
+          var content1 = 'falls mainly on the plain';
+          var blob1 = new Blob([content1], { type: "text"});
+          fd.append("blob1", blob1);
+          var a = {'foo': 1, 'bar': '111'}
+          var blob2 = new Blob([JSON.stringify(a)], { type: "text"});
+          fd.append("blob2", blob2);
+          var tet = $.ajax({
+              headers: { "X-CSRFToken": csrftoken },
+              url: '/crapola/',
+              type: 'POST',
+              data: fd,
+              async: false,
+              contentType: false,
+              processData: false,
+              enctype: 'multipart/form-data',
+              error: function (error) {
+                console.log(error);
+              }
+          })
+          }
+    </script>
+  </head>
+
+  <body>
+    <form id="upload_form" enctype="multipart/form-data" action="receive/" method="post"> {% csrf_token %}
+      <table border="1">
+        {{ form }}
+      </table>
+      <input type="submit" value="OK">
+    </form>
+    <input type='button' value='Send blob' onclick='SendBlob()'>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+{% load static %}
+<header>{{label}}</header>
+<table>
+  {% for row in grid %}
+    <tr>
+    {% if forloop.first %}
+      {% for col in row %}
+        {% if forloop.first %}
+          <th></th>
+        {% else %}
+          <th><div onclick="ShowClass('{{col}}');">{{col}}</div></th>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      {% for col in row %}
+        {% if forloop.first %}
+          <th><div onclick="ShowFamily('{{col}}');">{{col}}</div></th>
+        {% else %}
+          <td>
+          <img src={% static 'Artifacts/'|add:col|add:'/thumbnail.png' %} alt="(none)" onError="this.onerror=null", width="100", height="100">
+          </td>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    </tr>
+  {% endfor %}
+</table>

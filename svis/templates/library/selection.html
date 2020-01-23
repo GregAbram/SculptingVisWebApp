@@ -1,0 +1,18 @@
+{% load static %}
+<table>
+  {% for selection in selections %}
+    <tr>
+      <td>
+          <img src={% static 'Artifacts/'|add:selection.uuid|add:'/thumbnail.png' %} alt="(none)" onError="this.onerror=null", width="100">
+      </td>
+      <td>
+          'family': {{ selection.family }}<br>
+          'class': {{ selection.class }}<br>
+          'uuid': {{ selection.uuid }}
+      </td>
+      <td>
+        <input type='button' value='Remove' onclick='RmSelection("{{selection.uuid}}")'>
+      </td>
+    </tr>
+  {% endfor %}
+</table>
