@@ -10,6 +10,59 @@
 {% csrf_token %}
 
 <script type="text/javascript">
+  
+  var selections = [];
+
+  var RenderSelections = function()
+  {
+    if (selections.length > 0)
+    {
+      $("#cselection").prop('disabled', false);
+      $("#dselection").prop('disabled', false);
+      $("#rselection").prop('disabled', false);
+    }
+    else
+    {
+      $("#cselection").prop('disabled', true);
+      $("#dselection").prop('disabled', true);
+      $("#rselection").prop('disabled', true);
+    }
+
+    let table = document.createElement('table');
+    let b = document.createElement('tbody');
+    table.appendChild(b);
+
+    selections.forEach(function (uuid) {
+
+      let r = document.createElement('tr');
+      b.appendChild(r);
+
+      let d = document.createElement('td');
+      r.appendChild(d);
+
+      img = document.createElement('img');
+      img.setAttribute('src', "{% static 'Artifacts/' %}" + uuid + '/thumbnail.png')
+      img.setAttribute('alt', '(none)');
+      img.setAttribute('onerror', 'this.onerror=null');
+      img.setAttribute('width', '100');
+
+      d.appendChild(img);
+
+      d = document.createElement('td');
+      r.appendChild(d);
+
+      inpt = document.createElement('input');
+      inpt.setAttribute('type', 'button');
+      inpt.setAttribute('value', 'Remove');
+      inpt.setAttribute('onclick', 'RmSelection("' + uuid + '");');
+      
+      d.appendChild(inpt);
+    
+    });
+
+    document.getElementById('selectionDiv').innerHTML = '';
+    document.getElementById('selectionDiv').appendChild(table);
+  }
 
   var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
   var artifact_type = 'glyph';
@@ -23,28 +76,39 @@
   };
 
   var AddSelection = function(name) {
-    $.get('/library/addselection/' + name, "", function(data){  $('div[name="selections"]').html(data); }, "html");
+    if (selections.indexOf(name) === -1)
+      selections.push(name);
+    RenderSelections();
   }
 
   var RmSelection = function(name) {
-    $.get('/library/rmselection/' + name, "", function(data){  $('div[name="selections"]').html(data); }, "html");
+    tmp = [];
+    selections.forEach(function (uuid) {
+      if (uuid != name)
+        tmp.push(uuid);
+    });
+    selections = tmp;
+    RenderSelections();
   }
 
   var ClearSelections = function() {
-    $.get('/library/clear', "", function(data){  $('div[name="selections"]').html(data); }, "html");
+    selections = []
+    RenderSelections();
   }
 
   var DeleteFromLibrary = function() {
     if (confirm("Are you sure? This will remove the artifact from the library and place it in a trash directory on the library server.   If it does so, it can be restored by a sys admin"))
     {
-      $.get('/library/deleteselectedartifacts', "", function(data){  $('div[name="selections"]').html(data); }, "html");
+      $.get('/library/deleteselectedartifacts/' + selections.join(','), "", function(data){});
+      ClearSelections();
+      ShowArtifacts();
     };
   }
 
   var DownloadSelection = function() {
     const a = document.createElement('a');
     document.body.appendChild(a);
-    a.href = "/library/pulldown"
+    a.href = "/library/download/" + selections.join(',');
     a.click();
     $('div[name="selections"]').html("");
   }
@@ -146,10 +210,10 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
     <td width=75></td>
     <td valign="top">
       <h1>Selections</h1>
-      <div name='selections'></div>
-      <input type='button' value='Clear' onclick='ClearSelections()'>
-      <input type='button' value='Download' onclick='DownloadSelection()'>
-      <input type='button' value='Delete from Library' onclick='DeleteFromLibrary()'>
+      <div id='selectionDiv'></div>
+      <input id='cselection' disabled type='button' value='Clear' onclick='ClearSelections()'>
+      <input id='dselection' disabled type='button' value='Download' onclick='DownloadSelection()'>
+      <input id='rselection' disabled type='button' value='Delete from Library' onclick='DeleteFromLibrary()'>
     </td>
   </tr>
 </table>

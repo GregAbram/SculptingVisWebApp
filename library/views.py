@@ -41,7 +41,7 @@ class UploadFormView(FormView):
     doc['uuid'] = str(uuid1())
     doc['tags'] = []
     collection.insert_one(doc)
-    dirname = settings.STATIC_URL + '/Artifacts/' + artifact_name(doc) + '/'
+    dirname = settings.ARTIFACTS + '/' + artifact_name(doc) + '/'
     os.mkdir(dirname)
     files = request.FILES.getlist('files')
     if form.is_valid():
@@ -151,66 +151,18 @@ def showtypeclass(request, typ, clss):
   print(clss)
   return showlib(request)
 
-def addselection(request, uuid):
-  print("ADDSELECTION", request.session)
-  found = 0
-  if 'selections' in request.session:
-    for s in request.session['selections']:
-      if s['uuid'] == uuid:
-        found = 1
-        break
-  if found == 0:
-    mongo = MongoClient('localhost', 27017)
-    db = mongo.SculptingVis
-    collection = db['curated']
-    doc = collection.find_one({'uuid': uuid})
-    print('doc:', doc)
-    entry = {
-      'uuid': uuid,
-      'class': doc['class'],
-      'family': doc['family']
-    }
-    if 'selections' not in request.session:
-      request.session['selections'] = [ entry ]
-    else:
-      foo = request.session['selections'] + [entry]
-      request.session['selections'] = foo
-  params = {'selections': request.session['selections']}
-  return render(request, 'library/selection.html', params)
-
-def rmselection(request, uuid):
-  print("RMSELECTION", request.session)
-  old_selections = request.session['selections']
-  new_selections = []
-  for s in old_selections:
-    if s['uuid'] != uuid:
-      new_selections.append(s)
-  request.session['selections'] = new_selections
-  params = {'selections': request.session['selections']}
-  return render(request, 'library/selection.html', params)
-
-def clearselections(request):
-  print("CLEARSELECTIONS", request.session)
-  request.session['selections'] = []
-  params = {'selections': request.session['selections']}
-  return render(request, 'library/selection.html', params)
-
-def deleteselectedartifacts(request):
-  print("DELETESELECTEDARTIFACTS", request.session)
-  if 'selections' in request.session:
-    mongo = MongoClient('localhost', 27017)
-    db = mongo.SculptingVis
-    collection = db['curated']
-    trashdir = settings.STATIC_ROOT + '/trash'
-    if not os.path.exists(trashdir):
-      os.mkdir(trashdir)
-    for s in request.session['selections']:
-      print(s['uuid'])
-      uuid = s['uuid']
-      collection.delete_one({'uuid': uuid})
-      shutil.move(settings.STATIC_ROOT + '/Artifacts/' + uuid, trashdir)
-  request.session['selections'] = []
-  return render(request, 'library/library.html', {'uploadForm': uploadForm})
+def deleteselectedartifacts(request, uuids):
+  uuids = uuids.split(',')
+  mongo = MongoClient('localhost', 27017)
+  db = mongo.SculptingVis
+  collection = db['curated']
+  trashdir = settings.BASE_DIR + '/trash'
+  if not os.path.exists(trashdir):
+    os.mkdir(trashdir)
+  for uuid in uuids:
+    collection.delete_one({'uuid': uuid})
+    shutil.move(settings.ARTIFACTS + '/' + uuid, trashdir)
+  return HttpResponse('OK')
 
 def library(request):
   uploadForm = UploadForm()
@@ -219,19 +171,16 @@ def library(request):
 def success(request):
   return render(request, 'library/success.html', {})
 
-def downloadselection(request):
-  print("DOWNLOADSELECION", request.session)
-  if 'uuid' not in request.session:
-    request.session['uuid'] = str(uuid1())
-  tmpdir = settings.STATIC_ROOT+ '/tmp/' + request.session['uuid']
-  fname = tmpdir + '/artifacts.tgz'
+def downloadselection(request, uuids):
+  tmpdir = settings.BASE_DIR + '/tmp'
   if not os.path.exists(tmpdir):
     os.mkdir(tmpdir)
+  fname = tmpdir + '/artifacts.tgz'
   tfile = tarfile.open(fname, 'w:gz')
   current_dir = os.getcwd()
-  os.chdir(settings.STATIC_ROOT + '/Artifacts')
-  for selection in request.session['selections']:
-    tfile.add(selection['uuid'])
+  os.chdir(settings.ARTIFACTS)
+  for uuid in uuids.split(','):
+    tfile.add(uuid)
   tfile.close()
   os.chdir(current_dir)
   file = open(fname, 'rb')
