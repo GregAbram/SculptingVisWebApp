@@ -90,7 +90,7 @@ function setup() {
 
     var msg = $.ajax({
       headers: { "X-CSRFToken": csrftoken },
-      url: '/Library/applets/upload_texture_looper/',
+      url: '/applets/upload_texture_looper/',
       type: 'POST',
       data: fd,
       async: false,

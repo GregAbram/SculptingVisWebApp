@@ -410,7 +410,7 @@ function saveToLibrary() {
 
   var msg = $.ajax({
     headers: { "X-CSRFToken": csrftoken },
-    url: '/Library/applets/upload_infinite_line/',
+    url: '/applets/upload_infinite_line/',
     type: 'POST',
     data: fd,
     async: false,
