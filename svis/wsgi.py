@@ -16,10 +16,7 @@ for i in sys.path:
 
 import os
 
-print("XXXXXXXXXXXXXXX", os.getcwd())
 from django.core.wsgi import get_wsgi_application
-#os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'svis-test.settings')
 os.environ["DJANGO_SETTINGS_MODULE"] = "svis.settings"
-print("XXXXXXXXXXXXXXX 111", os.getcwd())
 application = get_wsgi_application()
 print("WSGI DJANGO running")

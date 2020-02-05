@@ -15,8 +15,8 @@ import os
 CSRF_USE_SESSIONS = True
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -25,10 +25,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'i5)1%vx92yf-h$#jqd)hjk*0be8so%(n$j+n0-**(4!p9acpy&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = True
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
+
 
 # Application definition
 
@@ -119,14 +119,20 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
-
-STATICFILES_DIRS = ['static']
+STATICFILES_DIRS = [
+  BASE_DIR + '/static'
+]
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/var/www/static/'
+STATIC_ROOT = '/data/static'
+
+# STATIC_URL = '/data/static/'
+# STATIC_ROOT = '/data/static/'
+
+ARTIFACTS = BASE_DIR + '/static/Artifacts'
+
+# I think this'll be right for Apache ARTIFACTS = settings.STATIC_ROOT + '/Artifacts'
 
 X_FRAME_OPTIONS = 'ALLOWALL'
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
+
