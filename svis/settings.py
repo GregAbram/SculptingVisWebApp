@@ -125,8 +125,8 @@ USE_TZ = True
 
 STATICFILES_DIRS = ['static']
 
-# STATIC_URL = '/static-test/'
-# STATIC_ROOT = '/var/www/static-test/'
+STATIC_URL = '/static/'
+STATIC_ROOT = '/var/www/static/'
 
 X_FRAME_OPTIONS = 'ALLOWALL'
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
