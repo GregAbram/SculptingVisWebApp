@@ -185,5 +185,4 @@ def downloadselection(request, uuids):
   os.chdir(current_dir)
   file = open(fname, 'rb')
   request.session['selections'] = []
-  print("XXXXXXXXXXXXXX")
   return FileResponse(file, as_attachment=True, filename='SculptingVis.tgz')
