@@ -3,6 +3,7 @@
   -moz-box-sizing: border-box;
 }
 
+
 body {
   color: #000;
   font-family:Monospace;
@@ -49,7 +50,7 @@ a {
 
 .list-item .scene {
   width: 500px;
-  height: 700px;
+  height: 500px;
 }
 
 .list-item .description {
@@ -58,4 +59,9 @@ a {
   font-size: large;
   width: 200px;
   margin-top: 0.5em;
+}
+
+button {
+  color: #000;
+  background-color: lightgrey;
 }

@@ -7,7 +7,6 @@ from django.forms import Form
 from django.views.generic.edit import FormView
 from django.conf import settings
 
-
 import json, pdb, os
 import numpy as np
 from PIL import Image
@@ -29,13 +28,15 @@ def load_applet(request, applet):
 
 def upload_glyph(request):
   if request.method == 'POST':
+    print('UPLOAD GLYPH!')
     form = Form(request.POST, request.FILES)
     metadata = json.loads(request.FILES['metadata'].read())
     obj = request.FILES['obj'].read()
     f = open('/tmp/tst.ply', 'wb')
     f.write(obj)
     f.close()
-    f = open('/home/gda/tmp/tst.ply', 'wb')
+    obj = request.FILES['thumbnail'].read()
+    f = open('/tmp/thumbnail.png', 'wb')
     f.write(obj)
     f.close()
   return HttpResponse("OK")

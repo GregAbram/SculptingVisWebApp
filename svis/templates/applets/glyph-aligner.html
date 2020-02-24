@@ -6,7 +6,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <base href="/">
-	<link rel="stylesheet" type="text/css" href="{% static 'glyph-aligner/style.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'glyph-aligner/style.css' %}"> 
 	</head>
 	<body ondrop="drop(event)" ondragover="allowDrop(event)">
 		<canvas id="c"></canvas>
@@ -27,21 +27,35 @@
     <td width=50></td>
     <td>
       <table>
-	<tr>
-	  <td>Family</td><td><input id="family" type="text" width=200 background-color=red;></td>
-	</tr>
-	<tr>
-	  <td>Class</td><td><input id="clss" type="text" width=200></td>
-	</tr>
-	<tr>
-	  <td colspan="2"><button type="button" onclick="exportToObj()">Export Obj</button><td>
-	</tr>
+        <tr>
+          <td align="center">
+            <canvas id='thumbnail_canvas' width=100 height=100 style="outline:2px solid black;" />
+          </td>
+        </tr>
+        <tr>
+          <td align="center">
+            <button type="button" onclick="RenderThumbnail()">Render Thumbnail</button></td>
+          </td>
+        </tr>
       </table>
     </td>
-  </tr>
+    <td width=50></td>
+    <td>
+      <table>
+        <tr>
+          <td align="center">Family</td><td><input id="family" type="text" width=200 background-color=red;></td>
+        </tr>
+        <tr>
+          <td align="center">Class</td><td><input id="clss" type="text" width=200></td>
+        </tr>
+        <tr>
+          <td colspan="2" align="center"><button type="button" onclick="exportToObj()">Export Obj</button></td>
+        </tr>
+        </table>
+    </td>
+	</tr>
 </table>
-
-      </div>
+</div>
 
     </div>
     

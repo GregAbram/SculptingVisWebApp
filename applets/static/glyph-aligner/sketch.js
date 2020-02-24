@@ -1,5 +1,4 @@
-/** TODO:
-
+/*
 ---- later ----
 - adjust center point
   - need some UI to specify translation
@@ -23,6 +22,9 @@ var glyphObj, axisGroup;
 var dataGroup;
 var scenes = [];
 var isDragging = false;
+
+var thumbnailURL;
+var thumbnailNode;
 
 var editWindowElement;
 
@@ -60,7 +62,7 @@ function init() {
   editWindowElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
 
   
-  var aspectRatio = 500/700; // todo: should be able to look up width/height
+  var aspectRatio = 500/500; // todo: should be able to look up width/height
   editCamera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
   editCamera.up.set(1,0,0);
   //editCamera.position.set(1, 0, 3.5);
@@ -139,11 +141,7 @@ function init() {
 		axisGroup.add(upMesh);
   } );
   
-  
   scenes.push(editScene);
-
-
-  
   
 	// SETUP DATA PREVIEW SCENE
 
@@ -160,7 +158,7 @@ function init() {
   dataScene.userData.element = element.querySelector( ".scene" );
   content.appendChild( element );
 
-  aspectRatio = 500/700; // todo: should be able to look up width/height
+  aspect = dataScene.userData.element.clientHeight / dataScene.userData.element.clientWidth;
   camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
   camera.position.set(0, 7, 10);
   dataScene.userData.camera = camera;
@@ -186,8 +184,6 @@ function init() {
   
   //document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 
-  
-
   // Load a dummy object
   var glyphGeom = new THREE.CylinderBufferGeometry( 0.05, 0.25, 1.0, 50 );
   var material = new THREE.MeshStandardMaterial( {
@@ -199,6 +195,37 @@ function init() {
 	loadNewGlyph(obj);  
 }
 
+function RenderThumbnail()
+{
+  var thumbnailCanvas = document.getElementById('thumbnail_canvas');
+  var thumbnailRenderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true, canvas: thumbnailCanvas, antialias: true });
+  thumbnailRenderer.setSize(100, 100);
+
+  var thumbnailCamera = editCamera.clone();
+  thumbnailCamera.position.set(editCamera.position.x / 3.0, editCamera.position.y / 3.0, editCamera.position.z / 3.0);
+
+  var thumbnailScene = new THREE.Scene();
+  thumbnailScene.background = new THREE.Color(0x111111);
+
+  thumbnailScene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444 ) );
+  var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+  light.position.set( 1, 1, 1 );
+  thumbnailScene.add( light );
+
+  thumbnailScene.add(glyphObj.clone());
+
+  thumbnailRenderer.render(thumbnailScene, thumbnailCamera);
+
+  thumbnailURL = thumbnailRenderer.domElement.toDataURL();
+
+  if (! thumbnailNode)
+  {
+    thumbnailNode = document.createElement("img");
+    document.body.appendChild(thumbnailNode);
+  }
+
+  thumbnailNode.src = thumbnailURL;
+}
 
 function updateSize() {
   var width = canvas.clientWidth;
@@ -482,60 +509,38 @@ function loadNewGlyph(obj) {
     }
   }
   
-  
-  var instancedGeometry;
+  instancedGeometry = new THREE.InstancedBufferGeometry().copy(glyphObj.geometry);
 
-  /**
-	if (glyphObj.geometry.attributes.position.count > 1000) {
-    console.log("simplify geom");
-	  // reduce the geometry
-  	var modifier = new THREE.SimplifyModifier();
-  	var geom = new THREE.Geometry().fromBufferGeometry(glyphObj.geometry);
-  	var count = Math.floor( geom.vertices.length * 0.375 ); // number of vertices to remove
-		var simplifiedGeom = modifier.modify( geom, count );
-	
-    var buffGeom = new THREE.BufferGeometry().fromGeometry(simplifiedGeom);
-   
-  	instancedGeometry = new THREE.InstancedBufferGeometry().copy(buffGeom);
-  }
-  else {**/
-  	instancedGeometry = new THREE.InstancedBufferGeometry().copy(glyphObj.geometry);
-  //}
-  
-  instancedGeometry.addAttribute( 'instanceColor', new THREE.InstancedBufferAttribute( new Float32Array( instanceColors ), 3 ) );
-  instancedGeometry.addAttribute( 'instancePos', new THREE.InstancedBufferAttribute( new Float32Array( instancePositions ), 3 ) );
-  instancedGeometry.addAttribute( 'instanceRot', new THREE.InstancedBufferAttribute( new Float32Array( instanceRotations ), 4 ) );
-
-
-  
-  // transform a standard material to support instanced rendering
+  instancedGeometry.addAttribute('instanceColor', new THREE.InstancedBufferAttribute(new Float32Array(instanceColors), 3));
+  instancedGeometry.addAttribute('instancePos', new THREE.InstancedBufferAttribute(new Float32Array(instancePositions), 3));
+  instancedGeometry.addAttribute('instanceRot', new THREE.InstancedBufferAttribute(new Float32Array(instanceRotations), 4));
+ 
   var material = new THREE.MeshStandardMaterial( { vertexColors: THREE.VertexColors, roughness: 0.5, metalness: 0 } );
-  material.onBeforeCompile = function ( shader ) {
-      shader.vertexShader = 'attribute vec3 instanceColor;\n  attribute vec3 instancePos;\n  attribute vec4 instanceRot;\n' + shader.vertexShader;
-      shader.vertexShader = shader.vertexShader.replace(
-        '#include <begin_vertex>',
-        [
-          'vec3 transformed = position + 2.0 * cross( instanceRot.xyz, cross( instanceRot.xyz, position ) + instanceRot.w * position ) + instancePos;',
-        ].join( '\n' )
-      );
-      
-			shader.vertexShader = shader.vertexShader.replace(
-        '#include <color_vertex>',
-        [
-          'vColor = instanceColor;'
-        ].join( '\n' )
-      );
-      
-      shader.fragmentShader = shader.fragmentShader.replace(
-        'vec4 diffuseColor = vec4( diffuse, opacity );',
-        'vec4 diffuseColor = vec4(vColor, 1.0);'
-      );
-      
-      //console.log(shader.vertexShader);
-      //console.log(shader.fragmentShader);    
-      materialShader = shader;
-  };
-  
+
+  material.onBeforeCompile = function ( shader )
+  {
+    shader.vertexShader = 'attribute vec3 instanceColor;\n  attribute vec3 instancePos;\n  attribute vec4 instanceRot;\n' + shader.vertexShader;
+    shader.vertexShader = shader.vertexShader.replace(
+      '#include <begin_vertex>',
+      [
+        'vec3 transformed = position + 2.0 * cross( instanceRot.xyz, cross( instanceRot.xyz, position ) + instanceRot.w * position ) + instancePos;',
+      ].join( '\n' )
+    );
+        
+    shader.vertexShader = shader.vertexShader.replace(
+    '#include <color_vertex>',
+      [
+        'vColor = instanceColor;'
+      ].join( '\n' )
+    );
+        
+    shader.fragmentShader = shader.fragmentShader.replace(
+      'vec4 diffuseColor = vec4( diffuse, opacity );',
+      'vec4 diffuseColor = vec4(vColor, 1.0);'
+    );
+        
+    materialShader = shader;
+  }
     
   var instancedMesh = new THREE.Mesh( instancedGeometry, material );
   instancedMesh.position.x = 0.1;
@@ -667,9 +672,7 @@ function exportToObj() {
   var material = new THREE.MeshStandardMaterial();
   var mesh = new THREE.Mesh( geomCopy, material );
   
-  // now, export the model in obj format
-  // var exporter = new THREE.OBJExporter();
-  var exporter = new THREE.PLYExporter();
+  var exporter = new THREE.OBJExporter();
   var result = exporter.parse(mesh, data => alert('done'), {binary: true});
 
   fd = new FormData()
@@ -678,19 +681,25 @@ function exportToObj() {
   b = new Blob([result], {'type': 'binary'});
   fd.append('obj', b);
 
-  var msg = $.ajax({
-    headers: { "X-CSRFToken": csrftoken },
-    url: '/Library/applets/upload_glyph/',
-    type: 'POST',
-    data: fd,
-    async: false,
-    contentType: false,
-    processData: false,
-    enctype: 'multipart/form-data',
-    error: function (error) {
-      console.log(error);
-    }
-  });
+  function sendForm(blob)
+  {
 
+    alert("sendForm");
+    
+    fd.append('thumbnail', blob);
 
+    var msg = $.ajax({
+      headers: { "X-CSRFToken": csrftoken },
+      url: '/applets/upload_glyph/',
+      type: 'POST',
+      data: fd,
+      async: false,
+      contentType: false,
+      processData: false,
+      enctype: 'multipart/form-data',
+      error: function (error) { console.log(error); }
+    });
+  }
+
+  document.getElementById('thumbnail_canvas').toBlob(sendForm, 'image/png');
 }
