@@ -36,7 +36,7 @@ class UploadFormView(FormView):
     doc = {'type': object_type, 'family': object_family, 'class': object_class}
     mongo = MongoClient('localhost', 27017)
     db = mongo.SculptingVis
-    collection = db['curated']
+    collection = db[settings.MONGO_DBNAME]
     members = list(collection.find(doc))
     doc['uuid'] = str(uuid1())
     doc['tags'] = []
@@ -65,7 +65,7 @@ def show(request):
   request.session['selections'] = []
   mongo = MongoClient('localhost', 27017)
   db = mongo.SculptingVis
-  collection = db['curated']
+  collection = db[settings.MONGO_DBNAME]
   types = ['colormap', 'texture'] + collection.distinct('type')
   params = { 'label': 'Artifacts', 'types': types, 'grid': [[]] }
   return render(request, 'library/browser.html', params)
@@ -73,7 +73,7 @@ def show(request):
 def showtype(request, typ):
   mongo = MongoClient('localhost', 27017)
   db = mongo.SculptingVis
-  collection = db['curated']
+  collection = db[settings.MONGO_DBNAME]
   tags = collection.distinct('tags')
   families = collection.find({'type': typ}).distinct('family')
   classes = collection.find({'type': typ}).distinct('class')
@@ -99,7 +99,7 @@ def showtype(request, typ):
 def showtypefam(request, typ, fam):
   mongo = MongoClient('localhost', 27017)
   db = mongo.SculptingVis
-  collection = db['curated']
+  collection = db[settings.MONGO_DBNAME]
   classes = collection.find({'type': typ}).distinct('class')
   columns = []
   maxl = 0
@@ -125,7 +125,7 @@ def showtypefam(request, typ, fam):
 def showtypeclass(request, typ, clss):
   mongo = MongoClient('localhost', 27017)
   db = mongo.SculptingVis
-  collection = db['curated']
+  collection = db[settings.MONGO_DBNAME]
   families = collection.find({'type': typ}).distinct('family')
   rows = []
   maxl = 0
@@ -155,7 +155,7 @@ def deleteselectedartifacts(request, uuids):
   uuids = uuids.split(',')
   mongo = MongoClient('localhost', 27017)
   db = mongo.SculptingVis
-  collection = db['curated']
+  collection = db[settings.MONGO_DBNAME]
   trashdir = settings.BASE_DIR + '/trash'
   if not os.path.exists(trashdir):
     os.mkdir(trashdir)

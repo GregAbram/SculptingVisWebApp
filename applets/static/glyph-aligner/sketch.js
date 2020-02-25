@@ -676,16 +676,18 @@ function exportToObj() {
   var result = exporter.parse(mesh, data => alert('done'), {binary: true});
 
   fd = new FormData()
-  fd.append('metadata', new Blob([JSON.stringify({'family': fam.value, 'class': clss.value})], {type: 'text'})); 
+
+  metadata = {'family': fam.value, 'class': clss.value};
+  s = JSON.stringify(metadata);
+
+  b = new Blob([s], {type: 'text'});
+  fd.append('metadata', b);
 
   b = new Blob([result], {'type': 'binary'});
   fd.append('obj', b);
 
   function sendForm(blob)
   {
-
-    alert("sendForm");
-    
     fd.append('thumbnail', blob);
 
     var msg = $.ajax({

@@ -127,10 +127,8 @@ STATICFILES_DIRS = [
 STATIC_URL = '/static/'
 STATIC_ROOT = '/Users/gda/svis/svis/'
 
-ARTIFACTS = BASE_DIR + '/static/Artifacts'
-
-# I think this'll be right for Apache ARTIFACTS = settings.STATIC_ROOT + '/Artifacts'
-
 X_FRAME_OPTIONS = 'ALLOWALL'
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
 
+ARTIFACTS = BASE_DIR + '/static/Artifacts'
+MONGO_DBNAME = 'curated'

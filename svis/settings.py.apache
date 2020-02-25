@@ -123,7 +123,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/static/'
 
-ARTIFACTS = STATIC_ROOT + '/Artifacts'
-
 X_FRAME_OPTIONS = 'ALLOWALL'
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
+
+ARTIFACTS = STATIC_ROOT + '/Artifacts'
+MONGO_DBNAME = 'curated'

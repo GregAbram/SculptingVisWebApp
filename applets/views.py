@@ -7,11 +7,12 @@ from django.forms import Form
 from django.views.generic.edit import FormView
 from django.conf import settings
 
-import json, pdb, os
+import json, pdb, os, sys
 import numpy as np
 from PIL import Image
 from uuid import uuid1
 from pymongo import MongoClient
+import subprocess
 
 from .forms import UploadForm
 
@@ -28,18 +29,70 @@ def load_applet(request, applet):
 
 def upload_glyph(request):
   if request.method == 'POST':
-    print('UPLOAD GLYPH!')
+    print('UPLOAD start!')
     form = Form(request.POST, request.FILES)
     metadata = json.loads(request.FILES['metadata'].read())
     obj = request.FILES['obj'].read()
-    f = open('/tmp/tst.ply', 'wb')
+    uuid = str(uuid1())
+    print('UPLOAD uuid', uuid)
+    dirname = settings.STATIC_ROOT + '/Artifacts/' + uuid + '/'
+    print('UPLOAD dirname', dirname)
+    os.mkdir(dirname)
+    print('UPLOAD destination dir created')
+    f = open(dirname + '/original.obj', 'wb')
     f.write(obj)
     f.close()
     obj = request.FILES['thumbnail'].read()
-    f = open('/tmp/thumbnail.png', 'wb')
+    f = open(dirname + '/thumbnail.png', 'wb')
     f.write(obj)
     f.close()
-  return HttpResponse("OK")
+    f = open('/home/gda/APACHE/tt.png', 'wb')
+    f.write(obj)
+    f.close()
+    object_family = metadata['family']
+    object_class = metadata['class']
+    blender_args = ['/bin/bash']
+    blender_args.append(settings.STATIC_ROOT + 'glyph-aligner/run_blender.sh')
+    blender_args.append(settings.STATIC_ROOT + 'glyph-aligner/Automating_lod_mapping.py')
+    blender_args.append(dirname + '/original.obj')
+    print('BLENDER args:', blender_args)
+    try:
+      os.system(' '.join(blender_args))
+      print('BLENDER OK')
+    except:
+      print('BLENDER could not be run')
+    a = {'artist': 'Francesca Samsel', 'preview': 'thumbnail.png'}
+    a['uuid'] = uuid
+    a['tags'] = []
+    a['family'] = object_family
+    a['class'] = object_class
+    a['type'] = 'type'
+    a['artifactMaterials'] = { 'clay': True }
+    a['artifactData'] = {
+	'lods': [
+	  {
+	    'mesh': 'LOD1.obj',
+	    'normal': 'LOD1.png'
+	  },
+	  {
+	    'mesh': 'LOD2.obj',
+	    'normal': 'LOD2.png'
+	  },
+	  {
+	    'mesh': 'LOD3.obj',
+	    'normal': 'LOD3.png'
+	  }
+        ]
+      }
+    f = open(dirname + '/artifact.json', 'w')
+    f.write(json.dumps(a, sort_keys=True, indent=4))
+    f.close()
+    mongo = MongoClient('localhost', 27017)
+    db = mongo.SculptingVis
+    collection = db[settings.MONGO_DBNAME]
+    doc = {'type': 'glyph', 'family': object_family, 'class': object_class, 'uuid': uuid, 'tags': []}
+    collection.insert_one(doc)
+  return HttpResponse('OK')
 
 def upload_color_loom(request):
   if request.method == 'POST':
@@ -54,14 +107,14 @@ def upload_color_loom(request):
     colormap = request.FILES['colormap'].read()
     mongo = MongoClient('localhost', 27017)
     db = mongo.SculptingVis
-    collection = db['curated']
+    collection = db[settings.MONGO_DBNAME]
     doc = {'type': 'colormap', 'family': object_family, 'class': object_class, 'uuid': str(uuid1()), 'tags': []}
     collection.insert_one(doc)
     dirname = settings.STATIC_ROOT + '/Artifacts/' + artifact_name(doc) + '/'
     os.mkdir(dirname)
     thumbnail.save(dirname + 'thumbnail.png')
     with open(dirname + 'colormap.xml', 'w') as d:
-      for i in colormap.decode("utf-8").split(','):
+      for i in colormap.decode('utf-8').split(','):
         d.write(i)
     a = {'artist': 'Francesca Samsel', 'preview': 'thumbnail.png'}
     a['uuid'] = doc['uuid']
@@ -74,7 +127,7 @@ def upload_color_loom(request):
     f.write(json.dumps(a, sort_keys=True, indent=4))
     f.close()
 
-  return HttpResponse("OK")
+  return HttpResponse('OK')
 
 def upload_infinite_line(request):
   if request.method == 'POST':
@@ -87,7 +140,7 @@ def upload_infinite_line(request):
     names = json.loads(request.FILES['names'].read());
     mongo = MongoClient('localhost', 27017)
     db = mongo.SculptingVis
-    collection = db['curated']
+    collection = db[settings.MONGO_DBNAME]
     doc = {'type': 'line', 'family': object_family, 'class': object_class, 'uuid': str(uuid1()), 'tags': []}
     collection.insert_one(doc)
 
@@ -118,7 +171,7 @@ def upload_infinite_line(request):
     f.write(json.dumps(a, sort_keys=True, indent=4))
     f.close()
 
-  return HttpResponse("OK")
+  return HttpResponse('OK')
 
 def upload_texture_looper(request):
   if request.method == 'POST':
@@ -131,7 +184,7 @@ def upload_texture_looper(request):
 
     mongo = MongoClient('localhost', 27017)
     db = mongo.SculptingVis
-    collection = db['curated']
+    collection = db[settings.MONGO_DBNAME]
     doc = {'type': 'texture', 'family': object_family, 'class': object_class, 'uuid': str(uuid1()), 'tags': []}
     collection.insert_one(doc)
 
@@ -162,7 +215,7 @@ def upload_texture_looper(request):
     f.write(json.dumps(a, sort_keys=True, indent=4))
     f.close()
 
-  return HttpResponse("OK")
+  return HttpResponse('OK')
 
 class UploadFormView(FormView):
   form_class = UploadForm
@@ -178,7 +231,7 @@ class UploadFormView(FormView):
     doc = {'type': object_type, 'family': object_family, 'class': object_class}
     mongo = MongoClient('localhost', 27017)
     db = mongo.SculptingVis
-    collection = db['curated']
+    collection = db[settings.MONGO_DBNAME]
     doc['uuid'] = str(uuid1())
     doc['tags'] = []
     collection.insert_one(doc)
