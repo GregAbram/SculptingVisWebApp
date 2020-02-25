@@ -699,9 +699,13 @@ function exportToObj() {
       contentType: false,
       processData: false,
       enctype: 'multipart/form-data',
-      error: function (error) { console.log(error); }
+      error: function (error) { console.log(error); },
+      complete: function() { 
+	  document.getElementById('spinner').style.display = 'none';
+      }
     });
   }
 
+  document.getElementById('spinner').style.display = 'block';
   document.getElementById('thumbnail_canvas').toBlob(sendForm, 'image/png');
 }
