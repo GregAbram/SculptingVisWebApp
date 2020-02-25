@@ -724,7 +724,7 @@ function upload(event)
 
   var tet = $.ajax({
       headers: { "X-CSRFToken": csrftoken },
-      url: '/Library/applets/upload_color_loom/',
+      url: '/applets/upload_color_loom/',
       type: 'POST',
       data: fd,
       async: false,

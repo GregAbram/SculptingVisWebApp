@@ -23,8 +23,10 @@ def applets(request):
   return render(request, 'applets/applets.html', {})
 
 def load_applet(request, applet):
+  print("LOAD APPLET 1", applet)
   template = 'applets/' + applet + '.html'
   uploadForm = UploadForm()
+  print("LOAD APPLET 2", applet)
   return render(request, template, {'uploadForm': uploadForm})
 
 def upload_glyph(request):
@@ -101,7 +103,6 @@ def upload_color_loom(request):
     object_class = form.data['clss']
     tsize = json.loads(request.FILES['thumbnail_size'].read())
     tpix = request.FILES['thumbnail_pixels'].read()
-    print('YYYYYYYYYYYY', tpix)
     tpix = np.frombuffer(tpix, dtype='uint8').reshape((tsize['height'], tsize['width'], 4))[:,:,0:3]
     thumbnail = Image.fromarray(tpix)
     colormap = request.FILES['colormap'].read()
@@ -109,6 +110,7 @@ def upload_color_loom(request):
     db = mongo.SculptingVis
     collection = db[settings.MONGO_DBNAME]
     doc = {'type': 'colormap', 'family': object_family, 'class': object_class, 'uuid': str(uuid1()), 'tags': []}
+    print("COLOR LOOM adding", doc)
     collection.insert_one(doc)
     dirname = settings.STATIC_ROOT + '/Artifacts/' + artifact_name(doc) + '/'
     os.mkdir(dirname)
