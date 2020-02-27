@@ -1,6 +1,6 @@
 /** TODO:
 - save/load entire workspace
-*/ 
+*/
 var cmap;
 var thumbnail;
 
@@ -11,7 +11,7 @@ class Rect {
     this._w = w;
     this._h = h;
   }
-  
+
   get x() { return this._x; }
   set x(xx) { this._x = xx; }
   get y() { return this._y; }
@@ -20,18 +20,18 @@ class Rect {
   set w(w) { this._w = w; }
   get h() { return this._h; }
   set h(h) { this._h = h; }
-  
+
 	x1() { return this._x; }
   x2() { return (this._x + this._w); }
   y1() { return this._y; }
   y2() { return this._y + this._h; }
-  
+
   center() { return [this._x + this._w/2.0, this._y + this._h/2.0]; }
-  
+
   containsPoint(xpos, ypos) {
     if ((xpos > this._x) && (xpos < this._x + this._w) &&
         (ypos > this._y) && (ypos < this._y + this._h)) {
-      return true; 
+      return true;
     }
     return false;
   }
@@ -46,10 +46,10 @@ class Swatch {
 
   get rect() { return this._rect; }
   set rect(r) { this._rect = r; }
-  
+
   get col() { return this._col; }
   set col(c) { this._col = c; }
-  
+
   draw(highlight, clipBounds) {
     if (highlight) {
 	    stroke(255,255,153);
@@ -73,15 +73,15 @@ class Swatch {
 
 class ColorMap {
   constructor() {
-    this.entries = []; 
+    this.entries = [];
   }
-  
+
   addControlPt(dataVal, col) {
     var entry = [dataVal, col];
     this.entries.push(entry);
     this.entries.sort(function(a,b) { return a[0]-b[0]; });
   }
-  
+
   editControlPt(origDataVal, newDataVal, newColor) {
     var i=0;
     while (i < this.entries.length) {
@@ -95,7 +95,7 @@ class ColorMap {
     }
     console.log("ColorMap::editControlPt no control point with data val = " + dataVal);
   }
-  
+
   removeControlPt(dataVal) {
     var i=0;
     while (i < this.entries.length) {
@@ -107,19 +107,19 @@ class ColorMap {
     }
     console.log("ColorMap::removeControlPt no control point with data val = " + dataVal);
   }
-  
+
   lookupColor(dataVal) {
     if (this.entries.length == 0) {
       //console.log("ColorMap::lookupColor empty color map.");
-      return color(255); 
+      return color(255);
     }
     else if (this.entries.length == 1) {
-      return this.entries[0][1]; 
+      return this.entries[0][1];
     }
     else {
       var minVal = this.entries[0][0];
       var maxVal = this.entries[this.entries.length-1][0];
-      
+
 	    // check bounds
   	  if (dataVal >= maxVal) {
     	  return this.entries[this.entries.length-1][1];
@@ -128,19 +128,19 @@ class ColorMap {
       	return this.entries[0][1];
       }
     	else {  // value within bounds
-        
+
         // make i = upper control pt and (i-1) = lower control point
 	      var i=1;
       	while (this.entries[i][0] < dataVal) {
 					i++;
 	      }
-                
+
       	// convert the two control points to lab space, interpolate
-        // in lab space, then convert back to rgb space        
+        // in lab space, then convert back to rgb space
 	      var c1 = this.entries[i-1][1];
 				var rgb1 = [red(c1), green(c1), blue(c1)];
         var lab1 = rgb2lab(rgb1);
-        
+
 	      var c2 = this.entries[i][1];
         var rgb2 = [red(c2), green(c2), blue(c2)];
         var lab2 = rgb2lab(rgb2);
@@ -152,7 +152,7 @@ class ColorMap {
         var labFinal = [lab1[0] * (1.0 - alpha)  +  lab2[0] * alpha,
                         lab1[1] * (1.0 - alpha)  +  lab2[1] * alpha,
         					      lab1[2] * (1.0 - alpha)  +  lab2[2] * alpha];
-        
+
         var rgbFinal = lab2rgb(labFinal);
         return rgbFinal;
       }
@@ -165,7 +165,7 @@ function buildColorMapFromSwatches(mySwatches, yMin, yMax) {
   for (var i=0; i<mySwatches.length; i++) {
     var val = (mySwatches[i].rect.center()[1] - yMin) / (yMax - yMin);
     constrain(val, 0.0, 1.0);
-    myCmap.addControlPt(val, mySwatches[i].col); 
+    myCmap.addControlPt(val, mySwatches[i].col);
   }
   return myCmap;
 }
@@ -201,21 +201,21 @@ function setup() {
   canvas.drop(gotFile);
 
   border = 15;
-  
+
   cpPanelRect = new Rect(border, 7*border, 100-2*border, height-8*border);
-  
+
   srcPanelRect = new Rect(100, 6*border, width-300-100, height-6*border);
   srcImageRects = [];
   srcImages = [];
   srcNumSwatches = [];
   srcNextSwatchX = [];
   srcNextSwatchY = [];
-  
+
 
   cmapPanelRect = new Rect(width-300, 6*border, 300, height-6*border);
 
   srcAndCmapPanelRect = new Rect(100, 6*border, width-100, height-6*border);
-  
+
   cmap = new ColorMap();
   /*
   cmapSwatches.push(new Swatch(new Rect(20,20,50,80), color(0,0,255)));
@@ -228,15 +228,15 @@ function setup() {
   cmapSwatches.push(new Swatch(new Rect(20,580,50,80), color(255,255,0)));
   cmapSwatches.push(new Swatch(new Rect(20,660,50,80), color(255,132,0)));
   cmapSwatches.push(new Swatch(new Rect(20,740,50,80), color(255,0,0)));
-  cmap = buildColorMapFromSwatches(cmapSwatches, border, cmapPanelRect.h-border);  
+  cmap = buildColorMapFromSwatches(cmapSwatches, border, cmapPanelRect.h-border);
   */
-  
+
   let saveButton = createButton('Save and Download');
   saveButton.position(cmapPanelRect.x + cmapPanelRect.w/2 - 100, 60);
   saveButton.size(200, 20);
   saveButton.mousePressed(saveAndDownload);
-  
-  
+
+
   /**
   // pre-calc cPicker images
   cPickerImages = [];
@@ -247,7 +247,7 @@ function setup() {
 	  var img = createImage(255+spacer+hueWidth, 255);
 
     for (var hb=0; hb<255; hb++) {
-      img.loadPixels();      
+      img.loadPixels();
       // SB square for this hue
       for (let s=0; s < 255; s++) {
         rgb = HSVtoRGB(hue/255, s/255, hb/255);
@@ -255,16 +255,16 @@ function setup() {
           img.set(s, hb, color(rgb));
         }
       }
-      
+
       // spacer
       for (var xx=255; xx<255+spacer; xx++) {
-        img.set(xx, hb, color(100,100,100,0)); 
+        img.set(xx, hb, color(100,100,100,0));
       }
 
       // hue selector
       for (var hx=255+spacer; hx<img.width; hx++) {
         rgb = HSVtoRGB(hb/255, 0.5, 0.5);
-        img.set(hx, hb, color(rgb)); 
+        img.set(hx, hb, color(rgb));
       }
     }
     img.updatePixels();
@@ -283,20 +283,20 @@ function drawCPicker(rect) {
   for (y=rect.y1(); y<rect.y2(); y++) {
     x = rect.x;
     var a = (y-rect.y1()) / rect.h;
-    
+
     stroke(a, 1.0, 0.7);//curHSB[1], curHSB[2]);
     line(x, y, x+xstep, y);
     x += 2*xstep;
-    
+
     stroke(curHSB[0], a, curHSB[2]);
     line(x, y, x+xstep, y);
     x += 2*xstep
-    
+
 		stroke(curHSB[0], curHSB[1], a);
     line(x, y, x+xstep, y);
   }
   colorMode(RGB, 255, 255, 255);
-  
+
   stroke(225);
 	x = rect.x;
   y = rect.y + (curHSB[0] * rect.h);
@@ -310,14 +310,14 @@ function drawCPicker(rect) {
 }
 
 
-function draw() { 
+function draw() {
   background(100);
-  
+
   var i;
-  
+
   var r = new Rect(10,10,70,150);
   drawCPicker(cpPanelRect);
-  
+
   // Labels across top of screen
   noStroke();
   fill(255);
@@ -329,12 +329,12 @@ function draw() {
   text('Drag up to 4 images onto the workspace.  Click and drag to sample colors from them.', srcPanelRect.x + srcPanelRect.w/2, 40);
   text('When you have a color you like, drag its swatch to the ColorMap Panel.', srcPanelRect.x + srcPanelRect.w/2, 55);
   text('Delete a swatch by pressing BACKSPACE or DELETE when your mouse is over it.', srcPanelRect.x + srcPanelRect.w/2, 70);
-  
+
   textSize(15);
   text('ColorMap Workspace', cmapPanelRect.x + cmapPanelRect.w/2, 20);
   textSize(10);
   text('Arrange swatches vertically. Colors interpolated in Lab space.', cmapPanelRect.x + cmapPanelRect.w/2, 40);
-  
+
 
   // ColorMap Panel
   resetMatrix();
@@ -347,11 +347,11 @@ function draw() {
 		rect(xDragStart, yDragStart,
          cmapSwatches[cmapHighlighted].rect.w, cmapSwatches[cmapHighlighted].rect.h);
   }
-  
+
 	for (i=0; i<cmapSwatches.length; i++) {
-    cmapSwatches[i].draw(i==cmapHighlighted, cmapPanelRect); 
+    cmapSwatches[i].draw(i==cmapHighlighted, cmapPanelRect);
   }
-  
+
   // draw color map along right edge
   for (var y=border; y<cmapPanelRect.h-border; y++) {
     var val = (y - border) / (cmapPanelRect.h-border);
@@ -359,7 +359,7 @@ function draw() {
 		stroke(rgb);
     line(0.80*cmapPanelRect.w-border, y, cmapPanelRect.w-border, y);
   }
-  
+
 
   textAlign(RIGHT, CENTER);
   var ypos = border;
@@ -372,23 +372,23 @@ function draw() {
     text(p, 0.80*cmapPanelRect.w-2*border, ypos);
     ypos += ystep;
   }
-	textAlign(CENTER, CENTER);  
+	textAlign(CENTER, CENTER);
 
   stroke(255);
   noFill();
   rect(0, 0, cmapPanelRect.w-1, cmapPanelRect.h-1);
-  
-  
-    
-  
+
+
+
+
   // Source Panel
   resetMatrix();
   translate(srcPanelRect.x1(), srcPanelRect.y1());
-  
+
   for (i=0; i<srcImageRects.length; i++) {
-    image(srcImages[i], srcImageRects[i].x, srcImageRects[i].y, srcImageRects[i].w, srcImageRects[i].h); 
+    image(srcImages[i], srcImageRects[i].x, srcImageRects[i].y, srcImageRects[i].w, srcImageRects[i].h);
   }
-  
+
   if (inSrcImage != -1) {
     var mx = mouseX - srcPanelRect.x;
     var my = mouseY - srcPanelRect.y;
@@ -403,7 +403,7 @@ function draw() {
   	rect(mx-25+15, my-40+15, 50-30, 80-30);
   	rect(mx-25, my-40, 50, 80);
   }
-  
+
   // Outline of orig location if a swatch is currently being dragged
 	if ((srcHighlighted != -1) && (mouseIsPressed)) {
     stroke(80);
@@ -411,12 +411,12 @@ function draw() {
 		rect(xDragStart, yDragStart,
          srcSwatches[srcHighlighted].rect.w, srcSwatches[srcHighlighted].rect.h);
   }
-  
+
   for (i=0; i<srcSwatches.length; i++) {
-    srcSwatches[i].draw(i==srcHighlighted, srcAndCmapPanelRect); 
+    srcSwatches[i].draw(i==srcHighlighted, srcAndCmapPanelRect);
   }
-  
-  
+
+
   stroke(255);
   noFill();
   rect(0, 0, srcPanelRect.w-1, srcPanelRect.h-1);
@@ -429,9 +429,9 @@ function mouseMoved() {
   cmapHighlighted = -1;
   srcHighlighted = -1;
   inSrcImage = -1;
-  
+
   var i, mx, my;
-  
+
   // first check for a new highlight in cmap panel
   mx = mouseX - cmapPanelRect.x;
   my = mouseY - cmapPanelRect.y;
@@ -457,16 +457,16 @@ function mouseMoved() {
     }
     i--;
   }
-    
+
   // check for mouse over source images
   mx = mouseX - srcPanelRect.x;
   my = mouseY - srcPanelRect.y;
   i=0;
   while (i<srcImageRects.length) {
     if (srcImageRects[i].containsPoint(mx, my)) {
-			inSrcImage = i; 
+			inSrcImage = i;
       var x01 = (mx - srcImageRects[inSrcImage].x) / srcImageRects[inSrcImage].w;
-      var y01 = (my - srcImageRects[inSrcImage].y) / srcImageRects[inSrcImage].h;    
+      var y01 = (my - srcImageRects[inSrcImage].y) / srcImageRects[inSrcImage].h;
       inSrcColor = srcImages[inSrcImage].get(x01*srcImages[inSrcImage].width, y01*srcImages[inSrcImage].height);
       return;
     }
@@ -479,7 +479,7 @@ function mouseMoved() {
 function mousePressed() {
   var tmp, mx, my;
 
-  // if a cmap swatch is highlighted  
+  // if a cmap swatch is highlighted
   if (cmapHighlighted != -1) {
     // move the highlighted swatch to the last element so it is
     // drawn last, on top of all the other swatches
@@ -494,7 +494,7 @@ function mousePressed() {
     xDragStart = cmapSwatches[cmapHighlighted].rect.x;
     yDragStart = cmapSwatches[cmapHighlighted].rect.y;
   }
-  
+
   // else if a source swatch is highlighted
 	else if (srcHighlighted != -1) {
     // move the highlighted swatch to the last element so it is
@@ -525,7 +525,7 @@ function mousePressed() {
       srcNextSwatchY[inSrcImage] += border + 80;
     }
   }
-  
+
   // check for mouse over color picker
   if (cpPanelRect.containsPoint(mouseX, mouseY)) {
 	  mx = mouseX - cpPanelRect.x;
@@ -534,44 +534,44 @@ function mousePressed() {
     if (index == 0) {
       curHSB[0] = my / cpPanelRect.h;
       if (srcLastHighlighted != -1) {
-        srcSwatches[srcLastHighlighted].col = HSVtoRGB(curHSB); 
+        srcSwatches[srcLastHighlighted].col = HSVtoRGB(curHSB);
       }
     }
     else if (index == 2) {
-	    curHSB[1] = my / cpPanelRect.h;   
+	    curHSB[1] = my / cpPanelRect.h;
       if (srcLastHighlighted != -1) {
-        srcSwatches[srcLastHighlighted].col = HSVtoRGB(curHSB); 
+        srcSwatches[srcLastHighlighted].col = HSVtoRGB(curHSB);
       }
     }
     else if (index == 4) {
-	    curHSB[2] = my / cpPanelRect.h;   
+	    curHSB[2] = my / cpPanelRect.h;
       if (srcLastHighlighted != -1) {
-        srcSwatches[srcLastHighlighted].col = HSVtoRGB(curHSB); 
+        srcSwatches[srcLastHighlighted].col = HSVtoRGB(curHSB);
       }
     }
-  }  
+  }
 }
 
 
 
 function mouseDragged() {
   var mx,my;
-  
-  if (srcHighlighted != -1) { 
+
+  if (srcHighlighted != -1) {
     mx = mouseX - srcPanelRect.x;
     my = mouseY - srcPanelRect.y;
 		srcSwatches[srcHighlighted].rect.x = mx + xDragOffset;
     srcSwatches[srcHighlighted].rect.y = my + yDragOffset;
   }
-  
-  else if (cmapHighlighted != -1) { 
+
+  else if (cmapHighlighted != -1) {
     mx = mouseX - cmapPanelRect.x;
     my = mouseY - cmapPanelRect.y;
 		cmapSwatches[cmapHighlighted].rect.x = mx + xDragOffset;
     cmapSwatches[cmapHighlighted].rect.y = my + yDragOffset;
-    cmap = buildColorMapFromSwatches(cmapSwatches, border, cmapPanelRect.h-border);  
+    cmap = buildColorMapFromSwatches(cmapSwatches, border, cmapPanelRect.h-border);
   }
-  
+
   // check for mouse over color picker
   else if (cpPanelRect.containsPoint(mouseX, mouseY)) {
 	  mx = mouseX - cpPanelRect.x;
@@ -580,28 +580,28 @@ function mouseDragged() {
     if (index == 0) {
       curHSB[0] = my / cpPanelRect.h;
       if (srcLastHighlighted != -1) {
-        srcSwatches[srcLastHighlighted].col = HSVtoRGB(curHSB); 
+        srcSwatches[srcLastHighlighted].col = HSVtoRGB(curHSB);
       }
     }
     else if (index == 2) {
-	    curHSB[1] = my / cpPanelRect.h;   
+	    curHSB[1] = my / cpPanelRect.h;
       if (srcLastHighlighted != -1) {
-        srcSwatches[srcLastHighlighted].col = HSVtoRGB(curHSB); 
+        srcSwatches[srcLastHighlighted].col = HSVtoRGB(curHSB);
       }
     }
     else if (index == 4) {
-	    curHSB[2] = my / cpPanelRect.h;  
+	    curHSB[2] = my / cpPanelRect.h;
       if (srcLastHighlighted != -1) {
-        srcSwatches[srcLastHighlighted].col = HSVtoRGB(curHSB); 
+        srcSwatches[srcLastHighlighted].col = HSVtoRGB(curHSB);
       }
     }
-  }  
+  }
 
 }
 
 
 
-function mouseReleased() {  
+function mouseReleased() {
   // check to see if a src swatch was just dropped onto the cmap panel
   if ((srcHighlighted != -1) &&  (srcSwatches[srcHighlighted].rect.center()[0] > srcPanelRect.w)) {
 
@@ -610,13 +610,13 @@ function mouseReleased() {
     var my = mouseY - cmapPanelRect.y + yDragOffset;
 		var c = srcSwatches[srcHighlighted].col;
     cmapSwatches.push(new Swatch(new Rect(mx,my,50,80), c));
-    cmap = buildColorMapFromSwatches(cmapSwatches, border, cmapPanelRect.h-border);  
+    cmap = buildColorMapFromSwatches(cmapSwatches, border, cmapPanelRect.h-border);
 
   	// move the src swatch back to its original location
     srcSwatches[srcHighlighted].rect.x = xDragStart;
     srcSwatches[srcHighlighted].rect.y = yDragStart;
-  }  
-  
+  }
+
   // update highlight
   mouseMoved();
 }
@@ -625,14 +625,98 @@ function mouseReleased() {
 
 var droppedImg;
 var droppedX, droppedY;
-function gotFile(file) {
-  if (file.type === 'image') {
-    droppedImg = loadImage(file.data, newInputLoaded);
+function gotFile(p5file) {
+  if (p5file.type === 'image') {
+    droppedImg = loadImage(p5file.data, newInputLoaded);
     droppedX = mouseX;
     droppedY = mouseY;
-  } 
+  }
+  else if (p5file.type.indexOf("text") == 0) {
+    console.log('Got some text');
+    //console.log(p5file.data);
+
+    const parser = new DOMParser();
+    const xmlDOM = parser.parseFromString(p5file.data, 'text/xml');
+    let p5xml = new p5.XML(xmlDOM.documentElement);
+    let maps = p5xml.getChildren('ColorMap');
+
+    for (let m = 0; m < maps.length; m++) {
+
+      // Create a colormap data structure based on the xml
+      let tmpCmap = new ColorMap();
+      let points = maps[m].getChildren('Point');
+      // for each <Point> within this colormap
+      for (let p = 0; p < points.length; p++) {
+        let x = points[p].getNum('x');
+        let r = points[p].getNum('r');
+        let g = points[p].getNum('g');
+        let b = points[p].getNum('b');
+        let col = color(r*255.0, g*255.0, b*255.0);
+        tmpCmap.addControlPt(x, col);
+      }
+
+      // Generate pixel data for a source image, as if we had drag and dropped an image on the canvas
+      var h = 0.2*srcPanelRect.h;
+      var w = h;
+      let img = createImage(w, h);
+      img.loadPixels();
+      for (let i = 0; i < img.width; i++) {
+        for (let j = 0; j < img.height; j++) {
+          img.set(i, j, color(tmpCmap.lookupColor(i/img.width)));
+        }
+      }
+      img.updatePixels();
+
+      // Add the new "dropped image" to the source panel
+      srcImages.push(img);
+      srcImages[srcImages.length-1].loadPixels();
+      var r = new Rect(border, border + srcImageRects.length*(h+2*border), w, h);
+      srcImageRects.push(r);
+      srcNumSwatches.push(0);
+      srcNextSwatchX.push(srcImageRects[srcImageRects.length-1].x2() + border);
+      srcNextSwatchY.push(srcImageRects[srcImageRects.length-1].y);
+
+      // Add swatches to the source panel
+      for (let p = 0; p < points.length; p++) {
+        let r = points[p].getNum('r');
+        let g = points[p].getNum('g');
+        let b = points[p].getNum('b');
+        let col = color(r*255.0, g*255.0, b*255.0);
+
+        // Create a new swatch
+    	var x = srcNextSwatchX[srcImageRects.length-1];
+    	var y = srcNextSwatchY[srcImageRects.length-1];
+    	srcSwatches.push(new Swatch(new Rect(x,y,50,80), col));
+    	srcNumSwatches[srcImageRects.length-1]++;
+        // Update position for next swatch
+    	srcNextSwatchX[srcImageRects.length-1] += border + 50;
+    	if (srcNextSwatchX[srcImageRects.length-1] >= srcPanelRect.w - border - 50) {
+      	  srcNextSwatchX[srcImageRects.length-1] = srcImageRects[srcImageRects.length-1].x2() + border;
+      	  srcNextSwatchY[srcImageRects.length-1] += border + 80;
+    	}
+      }
+
+      // If a colormap already exists, then don't do anything more because we don't want
+      // to wipe it out, but if nothing exists yet, then create one using the exact data
+      // that were just loaded in.  Not as simple as just cmap = tmpCmap because we need
+      // to create swatches in the cmap panel as well.
+      if (cmap.entries.length == 0) {
+        for (let p = 0; p < points.length; p++) {
+          let val = points[p].getNum('x');
+          let r = points[p].getNum('r');
+          let g = points[p].getNum('g');
+          let b = points[p].getNum('b');
+          let col = color(r*255.0, g*255.0, b*255.0);
+          var mx = border;
+          var my = border + val*(cmapPanelRect.h - 2*border);
+          cmapSwatches.push(new Swatch(new Rect(mx,my,50,80), col));
+        }
+        cmap = buildColorMapFromSwatches(cmapSwatches, border, cmapPanelRect.h-border);
+      }
+    }
+  }
   else {
-    console.log('Not an image file!');
+    console.log('Can only accept image files or xml colormap files!');
   }
 }
 
@@ -646,7 +730,7 @@ function newInputLoaded() {
   var r = new Rect(border, border + srcImageRects.length*(h+2*border), s*droppedImg.width, s*droppedImg.height);
   srcImageRects.push(r);
   srcNumSwatches.push(0);
-  
+
   droppedImg.loadPixels();
   var pixelData = [];
 	for (var j=0; j<droppedImg.height; j++) {
@@ -655,7 +739,7 @@ function newInputLoaded() {
       pixelData.push([droppedImg.pixels[index+0], droppedImg.pixels[index+1], droppedImg.pixels[index+2]]);
     }
   }
-  
+
   srcNextSwatchX.push(srcImageRects[srcImageRects.length-1].x2() + border);
   srcNextSwatchY.push(srcImageRects[srcImageRects.length-1].y);
 
@@ -665,7 +749,7 @@ function newInputLoaded() {
 
   if (palette) {
     palette.sort(function(a, b){return RGBtoHSV(a)[2]-RGBtoHSV(b)[2]});
-    
+
     for (var p=0; p<palette.length; p++) {
       // Create a new swatch
     	var x = srcNextSwatchX[srcImageRects.length-1];
@@ -679,7 +763,7 @@ function newInputLoaded() {
       	srcNextSwatchY[srcImageRects.length-1] += border + 80;
     	}
     }
-  }  
+  }
 }
 
 function saveAndDownload() {
@@ -693,13 +777,13 @@ function saveAndDownload() {
 	}
 
 	thumbnail.updatePixels();
-  
+
   colormap = [];
   colormap.push("<ColorMaps>");
-	colormap.push('<ColorMap space="CIELAB" indexedLookup="false" name="ColorLoom">');  
+	colormap.push('<ColorMap space="CIELAB" indexedLookup="false" name="ColorLoom">');
   for (let j=0; j<cmap.entries.length; j++) {
     colormap.push('<Point x="' + cmap.entries[j][0] + '"' +
-                    ' o="1" ' + 
+                    ' o="1" ' +
                     ' r="' + red(cmap.entries[j][1])/255 + '"' +
                     ' g="' + green(cmap.entries[j][1])/255 + '"' +
                     ' b="' + blue(cmap.entries[j][1])/255 + '"/>');
@@ -744,18 +828,18 @@ function keyPressed() {
     }
 		else if (cmapHighlighted != -1) {
      	cmapSwatches.splice(cmapHighlighted, 1);
-      cmap = buildColorMapFromSwatches(cmapSwatches, border, cmapPanelRect.h-border);  
+      cmap = buildColorMapFromSwatches(cmapSwatches, border, cmapPanelRect.h-border);
     }
-    
+
     // update highlight
     mouseMoved();
   }
 }
 
 function cpickerUpdate() {
-  console.log(cPicker.value()); 
+  console.log(cPicker.value());
   if (srcLastHighlighted != -1) {
-    srcSwatches[srcLastHighlighted].col = cPicker.value(); 
+    srcSwatches[srcLastHighlighted].col = cPicker.value();
   }
 }
 
@@ -856,8 +940,8 @@ function lab2rgb(lab){
   g = (g > 0.0031308) ? (1.055 * Math.pow(g, 1/2.4) - 0.055) : 12.92 * g;
   b = (b > 0.0031308) ? (1.055 * Math.pow(b, 1/2.4) - 0.055) : 12.92 * b;
 
-  return [Math.max(0, Math.min(1, r)) * 255, 
-          Math.max(0, Math.min(1, g)) * 255, 
+  return [Math.max(0, Math.min(1, r)) * 255,
+          Math.max(0, Math.min(1, g)) * 255,
           Math.max(0, Math.min(1, b)) * 255]
 }
 
