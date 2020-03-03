@@ -148,11 +148,23 @@ function synthesizeTexture() {
     else {
       // no fancy jump, just go to the next row
       inputRow += step;
-      // if this would run off the bottom or top of the image, reverse direction
-      if ((inputRow < 0) || (inputRow >= inputImg.height)) {
-        step = -step;
-        inputRow += 2*step;
+      // if this would run off the bottom or top of the image, do something to save the day
+      // new approach: just start over at the other side of the image -- should work well if the artist designed the
+      // texture with this in mind.  A better idea for the future could be to check to find the first and last rows
+      // in the image that have good jumps and then always take them.
+      if (inputRow < 0) {
+	inputRow = inputImg.height-1;      
       }
+      else if (inputRow >= inputImg.height) {
+	inputRow = 0;      
+      }
+
+      // orig: reversed direction, but turns out textures are often directional so bad idea.
+      // could be made a toggle.
+      //if ((inputRow < 0) || (inputRow >= inputImg.height)) {
+      //  step = -step;
+      //  inputRow += 2*step;
+      //}
     }
     //console.log("synthesizing texture [" + nfc(100.0*r/synthImg.height,2) + "%]");
   }
