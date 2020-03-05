@@ -10,6 +10,7 @@ let loopImg;
 let simMat;
 let goodJumps;
 
+let justRepeatCheckbox;
 let jumpProbabilitySlider;
 let goodJumpThreshSlider;
 let minJumpSizeSlider;
@@ -19,6 +20,7 @@ let minJumpSizeInput;
 let goalHeight = 2048;
 let synthHeight = goalHeight * 5;
 
+let simMatInitialized = false;
 let simMatReady;
 let synthReady;
 let calcSimMatRow;
@@ -42,14 +44,18 @@ function initSimMat() {
   for (let i=0; i<inputImg.height; i++) {
     simMat[i] = new Array(inputImg.height);
     for (let j=0; j<inputImg.height; j++) {
-      simMat[i][j] = 0.0; 
+      simMat[i][j] = 0.0;
     }
-  }  
+  }
+  simMatInitialized = true;
 }
 
 
 // Needs to be recalculated whenever the inputImg changes
 function calcOneRowOfSimMat() {
+  if (!simMatInitialized) {
+    initSimMat();
+  }
   let i = calcSimMatRow;
   // removed the i forloop below in favor of computing one line at a time and displaying a progress bar, since this takes a while
   //for (let i=0; i<inputImg.height; i++) {
@@ -67,11 +73,11 @@ function calcOneRowOfSimMat() {
           let rj = inputImg.pixels[indexj];
           let gj = inputImg.pixels[indexj + 1];
           let bj = inputImg.pixels[indexj + 2];
-          
-          let brighti = ri; // (ri + gi + bi) / 3.0;          
+
+          let brighti = ri; // (ri + gi + bi) / 3.0;
           let brightj = rj; // (rj + gj + bj) / 3.0;
-                    
-          let rowDiff = pow(brighti - brightj, 2.0);          
+
+          let rowDiff = pow(brighti - brightj, 2.0);
           if (rowDiff > 0) {
            	rowDiff = sqrt(rowDiff);
             diff += rowDiff;
@@ -80,7 +86,7 @@ function calcOneRowOfSimMat() {
       //}
       simMat[i][j] = diff;
       if (diff > maxDiff) {
-        maxDiff = diff; 
+        maxDiff = diff;
       }
     }
     //console.log("computing similarity [" + nfc(100.0*i/inputImg.height,2) + "%]");
@@ -97,7 +103,7 @@ function calcOneRowOfSimMat() {
         simMat[i][j] = 1.0 - (simMat[i][j] / maxDiff);
       }
     }
-  
+
     //console.log('Done computing similarity matrix.');
     simMatReady = true;
     synthesizeTexture();
@@ -109,75 +115,94 @@ function calcOneRowOfSimMat() {
 // utility func for synthesizeTexture
 function copyRow(inputRow, synthRow) {
   for (let c=0; c<inputImg.width; c++) {
-    synthImg.set(c, synthRow, inputImg.get(c, inputRow));     
+    synthImg.set(c, synthRow, inputImg.get(c, inputRow));
   }
 }
 
 // Needs to be recalculated whenever the slider parameters change
 function synthesizeTexture() {
-  
-  //console.log('Computing good jumps for each row.');
-  // Compute "good jumps" for each row  
-  goodJumps = new Array(inputImg.height);
-  let thresh = goodJumpThreshSlider.value() / 100.0;
-  for (let i=0; i<inputImg.height; i++) {
-    goodJumps[i] = [];
-    for (let j=0; j<simMat[i].length; j++) {
-      if ((simMat[i][j] > thresh) && (abs(j-i) >= minJumpSizeSlider.value())) {
-        goodJumps[i].push(j);  
+  synthReady = false;
+  if (justRepeatCheckbox.checked()) {
+    // create synth image and initialize with a random row from the input image
+    synthImg = createImage(inputImg.width, inputImg.height);
+    for (let r=0; r<synthImg.height; r++) {
+      copyRow(r, r);
+    }
+    synthImg.updatePixels();
+
+    loopImg = createImage(inputImg.width, goalHeight);
+    for (let r=0; r<loopImg.height; r++) {
+      for (let c=0; c<loopImg.width; c++) {
+        loopImg.set(c, r, synthImg.get(c, r % synthImg.height));
       }
     }
+    loopImg.updatePixels();
+    synthReady = true;
   }
-
-  //console.log('Creating synth texture.');
-  let rows = [];
-  // create synth image and initialize with a random row from the input image
-  synthImg = createImage(inputImg.width, synthHeight);
-  let inputRow = floor(random(inputImg.height));  
-  let step = 1;
-  for (let r=0; r<synthImg.height; r++) {
-    copyRow(inputRow, r);  
-    rows[r] = inputRow;
-
-    if ((goodJumps[inputRow].length > 0) && (random(100.0) <= jumpProbabilitySlider.value())) {
-      // take (one of) the available good jumps
-      let s = goodJumps[inputRow].length;
-      let i = floor(random(goodJumps[inputRow].length));
-      inputRow = goodJumps[inputRow][i];
-    }
-    else {
-      // no fancy jump, just go to the next row
-      inputRow += step;
-      // if this would run off the bottom or top of the image, reverse direction
-      if ((inputRow < 0) || (inputRow >= inputImg.height)) {
-        step = -step;
-        inputRow += 2*step;
+  else if (simMatReady) {
+    //console.log('Computing good jumps for each row.');
+    // Compute "good jumps" for each row
+    goodJumps = new Array(inputImg.height);
+    let thresh = goodJumpThreshSlider.value() / 100.0;
+    for (let i=0; i<inputImg.height; i++) {
+      goodJumps[i] = [];
+      for (let j=0; j<simMat[i].length; j++) {
+        if ((simMat[i][j] > thresh) && (abs(j-i) >= minJumpSizeSlider.value())) {
+          goodJumps[i].push(j);
+        }
       }
     }
-    //console.log("synthesizing texture [" + nfc(100.0*r/synthImg.height,2) + "%]");
-  }
-  synthImg.updatePixels();
-  
 
-  //console.log("Creating loop texture.");
-  // heuristic to make an output texture that loops.  find the best section of goal height
-  let bestMatch = 0;
-  let bestMatchVal = simMat[rows[0]][rows[goalHeight]];
-  for (let r=1; r < synthImg.height - goalHeight; r++) {
-    let matchVal = simMat[rows[r]][rows[r+goalHeight]];
-    if (matchVal > bestMatchVal) {
-      bestMatch = r;
-      bestMatchVal = matchVal;
+    //console.log('Creating synth texture.');
+    let rows = [];
+    // create synth image and initialize with a random row from the input image
+    synthImg = createImage(inputImg.width, synthHeight);
+    let inputRow = floor(random(inputImg.height));
+    let step = 1;
+    for (let r=0; r<synthImg.height; r++) {
+      copyRow(inputRow, r);
+      rows[r] = inputRow;
+
+      if ((goodJumps[inputRow].length > 0) && (random(100.0) <= jumpProbabilitySlider.value())) {
+        // take (one of) the available good jumps
+        let s = goodJumps[inputRow].length;
+        let i = floor(random(goodJumps[inputRow].length));
+        inputRow = goodJumps[inputRow][i];
+      }
+      else {
+        // no fancy jump, just go to the next row
+        inputRow += step;
+        // if this would run off the bottom or top of the image, reverse direction
+        if ((inputRow < 0) || (inputRow >= inputImg.height)) {
+          step = -step;
+          inputRow += 2*step;
+        }
+      }
+      //console.log("synthesizing texture [" + nfc(100.0*r/synthImg.height,2) + "%]");
     }
+    synthImg.updatePixels();
+
+
+    //console.log("Creating loop texture.");
+    // heuristic to make an output texture that loops.  find the best section of goal height
+    let bestMatch = 0;
+    let bestMatchVal = simMat[rows[0]][rows[goalHeight]];
+    for (let r=1; r < synthImg.height - goalHeight; r++) {
+      let matchVal = simMat[rows[r]][rows[r+goalHeight]];
+      if (matchVal > bestMatchVal) {
+        bestMatch = r;
+        bestMatchVal = matchVal;
+      }
+    }
+    loopImg = createImage(inputImg.width, goalHeight);
+    for (let r=0; r<loopImg.height; r++) {
+      for (let c=0; c<loopImg.width; c++) {
+        loopImg.set(c, r, synthImg.get(c, bestMatch + r));
+      }
+    }
+    loopImg.updatePixels();
+    synthReady = true;
   }
-  loopImg = createImage(inputImg.width, goalHeight);
-  for (let r=0; r<loopImg.height; r++) {
-    for (let c=0; c<loopImg.width; c++) {
-      loopImg.set(c, r, synthImg.get(c, bestMatch + r));     
-    }  
-  }
-  loopImg.updatePixels();
-  synthReady = true;
 }
 
 
@@ -186,10 +211,14 @@ function setup() {
   canvas = createCanvas(1400, 700);
   // Add an event for when a file is dropped onto the canvas
   canvas.drop(gotFile);
-  
+
   // Setup sliders for various parameters of the algorithm
+  justRepeatCheckbox = createCheckbox('', true);
+  justRepeatCheckbox.position(20, 40);
+  justRepeatCheckbox.changed(updateTextParam);
+
   jumpProbabilitySlider = createSlider(0, 100, 10);
-  jumpProbabilitySlider.position(20, 40);
+  jumpProbabilitySlider.position(20, 100);
   jumpProbabilitySlider.input(updateSliderParam);
   jumpProbabilityInput = createInput(jumpProbabilitySlider.value());
   jumpProbabilityInput.position(jumpProbabilitySlider.x + jumpProbabilitySlider.width + 10, jumpProbabilitySlider.y);
@@ -197,76 +226,85 @@ function setup() {
   jumpProbabilityInput.input(updateTextParam);
 
   goodJumpThreshSlider = createSlider(0, 100, 95);
-  goodJumpThreshSlider.position(20, 100);
+  goodJumpThreshSlider.position(20, 160);
   goodJumpThreshSlider.input(updateSliderParam);
   goodJumpThreshInput = createInput(goodJumpThreshSlider.value());
   goodJumpThreshInput.position(goodJumpThreshSlider.x + goodJumpThreshSlider.width + 10, goodJumpThreshSlider.y);
   goodJumpThreshInput.style('width', '24px');
   goodJumpThreshInput.input(updateTextParam);
-  
+
   minJumpSizeSlider = createSlider(0, 100, 20);
-  minJumpSizeSlider.position(20, 160);
+  minJumpSizeSlider.position(20, 220);
   minJumpSizeSlider.input(updateSliderParam);
   minJumpSizeInput = createInput(minJumpSizeSlider.value());
   minJumpSizeInput.position(minJumpSizeSlider.x + minJumpSizeSlider.width + 10, minJumpSizeSlider.y);
   minJumpSizeInput.style('width', '24px');
   minJumpSizeInput.input(updateTextParam);
-  
+
   texHeightInput = createInput(2048);
-  texHeightInput.position(20, 220);
+  texHeightInput.position(20, 280);
   texHeightInput.style('width', '60px');
   texHeightInput.input(updateTextParam);
 
   familyInput = createInput();
-  familyInput.position(90, 320);
+  familyInput.position(90, 380);
   familyInput.style('width', '120px');
 
   classInput = createInput();
-  classInput.position(90, 350);
+  classInput.position(90, 410);
   classInput.style('width', '120px');
 
   let saveButton = createButton('Save to Library');
-  saveButton.position(20, 380);
+  saveButton.position(20, 440);
   saveButton.mousePressed(saveToLibrary);
 }
 
 
 let yOffset = 0;
 
+
+
 function draw() {
   background(bgcol);
-  
+
   noStroke();
   textSize(15);
   textAlign(LEFT);
-  text('How often to jump around?', jumpProbabilitySlider.x, 32);
-  text('How well do jumps have to match?', goodJumpThreshSlider.x, 92);
-  text('Minimum jump size in pixels?', minJumpSizeSlider.x, 152);
-  text('Height of output texture?', texHeightInput.x, 212);
+  text('Nothing fancy -- just repeat it.', justRepeatCheckbox.x, 32);
+
+  if (justRepeatCheckbox.checked()) {
+    fill(150);
+  }
+  text('How often to jump around?', jumpProbabilitySlider.x, 92);
+  text('How well do jumps have to match?', goodJumpThreshSlider.x, 152);
+  text('Minimum jump size in pixels?', minJumpSizeSlider.x, 212);
+  text('Height of output texture?', texHeightInput.x, 272);
+
+  fill(255);
   text("Family?", 20, familyInput.y+12);
   text("Class?", 20, classInput.y+12);
 
-       
+
   stroke(255);
   canvas.strokeWeight(3);
   line(traySize, 0, traySize, canvas.height);
   canvas.strokeWeight(1);
-    
+
   if (inputImg) {
-    
+
     // draw the raw input image on left hand side
     let margin = 30;
     let inputStart = traySize;
     let synthStart = traySize + inputSize;
     let synthSize = canvas.width - synthStart;
-    
+
     noStroke();
     textAlign(CENTER);
     text('Raw input (' + inputImg.width + "x" + inputImg.height + ")", inputStart + inputSize/2, margin/2);
     image(inputImg, inputStart + inputSize/2 - inputImg.width/2, margin, inputImg.width, inputImg.height);
-    
-    if (calcSimMatRow < inputImg.height) {
-      calcOneRowOfSimMat(); 
+
+    if ((!simMatReady) && (!justRepeatCheckbox.checked())) { // calcSimMatRow < inputImg.height
+      calcOneRowOfSimMat();
       textAlign(CENTER);
       text('Analyzing input image line by line...', synthStart + synthSize/2, canvas.height/2 - 35);
       stroke(0);
@@ -279,10 +317,10 @@ function draw() {
       line(synthStart + synthSize/2 - 150, canvas.height/2,
            synthStart + synthSize/2 - 150 + progressLen, canvas.height/2);
     }
-    
+
     // draw the new synthesized image on the right hand side
     if (synthReady) {
-      let step = loopImg.width + 10;      
+      let step = loopImg.width + 10;
       let yTotal = canvas.height - margin;
       let y = 0; // carryover from previous column
       for (let x = synthStart + loopImg.width/2; x < canvas.width; x += step) {
@@ -296,16 +334,16 @@ function draw() {
         }
         y += margin;
       }
-      
+
       fill(bgcol);
-			rect(synthStart, 0, synthSize, margin);      
+			rect(synthStart, 0, synthSize, margin);
       fill(255);
       noStroke();
       text('Synthesized, looping texture (' + loopImg.width + "x" + loopImg.height + ")",  synthStart + synthSize/2, 15);
-      
+
     }
 	}
-	else {  
+	else {
     fill(255);
     noStroke();
     textSize(24);
@@ -319,7 +357,7 @@ function draw() {
 function gotFile(file) {
   if (file.type === 'image') {
     inputImg = loadImage(file.data, newInputLoaded);
-  } 
+  }
   else {
     console.log('Not an image file!');
   }
@@ -327,7 +365,10 @@ function gotFile(file) {
 
 function newInputLoaded() {
   //console.log('Loaded input texture (' + inputImg.height + 'x' + inputImg.width + ')');
-  initSimMat();
+  simMatInitialized = false;
+  simMatReady = false;
+  synthReady = false;
+  synthesizeTexture();
 }
 
 function updateTextParam() {
@@ -337,18 +378,14 @@ function updateTextParam() {
   if (parseInt(texHeightInput.value()) > 0) {
 	  goalHeight = parseInt(texHeightInput.value());
   }
-  if (simMatReady) {
-    synthesizeTexture(); 
-  }
+  synthesizeTexture();
 }
 
 function updateSliderParam() {
   jumpProbabilityInput.value(jumpProbabilitySlider.value());
 	goodJumpThreshInput.value(goodJumpThreshSlider.value());
   minJumpSizeInput.value(minJumpSizeSlider.value());
-  if (simMatReady) {
-    synthesizeTexture(); 
-  }
+  synthesizeTexture();
 }
 
 
@@ -360,8 +397,8 @@ function keyTyped() {
 
 function saveAndDownload() {
   // save in a vertical orientation:
-  loopImg.save('synthesized-texture-vert', 'png'); 
-  
+  loopImg.save('synthesized-texture-vert', 'png');
+
 	// save in a horizontal orientation:
   var img = createImage(loopImg.height, loopImg.width);
 	img.loadPixels();
@@ -371,7 +408,7 @@ function saveAndDownload() {
   	}
 	}
 	img.updatePixels();
-  img.save('synthesized-texture-horiz', 'png'); 
+  img.save('synthesized-texture-horiz', 'png');
 }
 
 
@@ -384,7 +421,7 @@ function saveToLibrary() {
   fd.append(name + '_size', new Blob([JSON.stringify({'width': loopImg.width, 'height': loopImg.height})], {type: "text"}));
   fd.append(name + '_pixels', new Blob([loopImg.pixels], {'type': 'image/png'}));
   names.push(name);
-  
+
 	// save in a horizontal orientation:
   var horizImg = createImage(loopImg.height, loopImg.width);
 	horizImg.loadPixels();
