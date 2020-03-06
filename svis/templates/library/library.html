@@ -114,7 +114,11 @@
   }
 
   var ShowArtifacts = function() {
-    $.get('/library/showtype/' + artifact_type, "", function(data){  $('div[name="grid"]').html(data); }, "html");
+    $.get('/library/showtype/' + artifact_type, "", 
+	function(data) {  
+		g = $('div[name="grid"]')
+		g.html(data);
+	}, "html");
   }
 
   var ShowType = function(t)  {
@@ -191,21 +195,17 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
 <div>
   <dialog id=UploadDialog>
     <form id="upload_form" enctype="multipart/form-data" action="receive/" method="post" target=xrsp> {% csrf_token %}
-      <table>
-        {{ uploadForm }}
-      </table> 
-      <input type="submit" value="Upload">
-      <input type=button onclick=HideUploadDialog() value="Close"><br>
+       Choose Directory:  <input type="file" name="files[]" id="files" multiple directory="" webkitdirectory mozdirectory><br/>
+       <input type="submit" value="Upload">
+       <input type=button onclick=HideUploadDialog() value="Close">
     </form>
-    <iframe name=xrsp height=32></iframe>
   </dialog>
 </div>
 
 <table>
   <tr>
     <td width=600 valign="top">
-      <div name='grid'>
-      </div>
+      <div name='grid'></div>
     </td>
     <td width=75></td>
     <td valign="top">
