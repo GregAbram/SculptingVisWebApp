@@ -3,14 +3,15 @@ import initHandles from './handles.js'
 import { updateActiveThumbnail, setCropBackground, setCropContainment,
   setImage, getCroppedImageData, getCroppedImageToSave, updateCropMask,
   createThumbnailSelector, setCropNormalMap } from './crop.js'
+import { storage } from './storage.js'
 
 function setup() {
   // Try to load the image url from storage (don't lose data over refresh)
-  if (sessionStorage['currentImg']) {
-    let imgs = JSON.parse(sessionStorage['imgData']);
-    setCropBackground(sessionStorage['currentImg']);
+  if (storage.currentImg) {
+    let imgs = storage.imgData;
+    setCropBackground(storage.currentImg);
 
-    let norms = JSON.parse(sessionStorage['normalMaps']);
+    let norms = storage.normalMaps;
 
     for (let i in imgs) {
       $('#texture-list').prepend(createThumbnailSelector(i, imgs[i], norms[i]));
@@ -56,7 +57,7 @@ function setup() {
     let fd = new FormData(form);
     let names = []
 
-    let imgs = JSON.parse(sessionStorage['imgData']);
+    let imgs = storage.imgData;
     for (let i in imgs)
     {
       let imageData = getCroppedImageData(i, 'imgData');
@@ -74,7 +75,7 @@ function setup() {
       }
     }
 
-    let normalMaps = JSON.parse(sessionStorage['normalMaps']);
+    let normalMaps = storage.normalMaps;
     for (let i in normalMaps)
     {
       let imageData = getCroppedImageData(i, 'normalMaps');
@@ -130,18 +131,19 @@ function setup() {
   });
 
   // Set up saving for project name
-  sessionStorage.setItem('projectName', $('#project-name').attr('value'));
+  storage.projectName = $('#project-name').attr('value');
+  
   $('#project-name').on('keyup', (evt) => {
     evt.target.style.borderColor = 'black';
-    sessionStorage.setItem('projectName', evt.target.value);
+    storage.projectName = evt.target.value;
     setTimeout(() => {
       evt.target.style.borderColor = '#9ea';
     }, 500);
   });
 
   $('#new-project').on('click', (evt) => {
-    sessionStorage.clear();
-    sessionStorage.setItem('projectName', 'TEXTURE');
+    storage = {};
+    storage.projectName = 'TEXTURE';
     document.getElementById('project-name').value = 'TEXTURE';
     window.location.reload();
   });

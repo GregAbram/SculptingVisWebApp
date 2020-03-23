@@ -1,4 +1,5 @@
 import { wasm_pkg } from './loadWasm.js'
+import { storage } from './storage.js'
 
 const EXPORT_WIDTH = 1024;
 const EXPORT_HEIGHT = 1024;
@@ -17,7 +18,7 @@ export function updateCropMask() {
 
 // Set the image background based on its index
 export function setCropBackground(index) {
-  let imgs = JSON.parse(sessionStorage['imgData']);
+  let imgs = storage.imgData;
   let currentImgData = imgs[index];
   $('#image-to-crop').attr('src', currentImgData);
 }
@@ -25,10 +26,10 @@ export function setCropBackground(index) {
 export function setCropNormalMap() {
   let img = document.getElementById('image-to-crop');
   if (img.complete && img.naturalHeight !== 0) {
-    loadNormalMapToImage(sessionStorage['currentImg']);
+    loadNormalMapToImage(storage.currentImg);
   } else {
     $('#image-to-crop').on('load', () => {
-      loadNormalMapToImage(sessionStorage['currentImg']);
+      loadNormalMapToImage(storage.currentImg);
       $('#image-to-crop').off('load');
     });
   }
@@ -46,31 +47,31 @@ export function setImage(imgData) {
   $('#drag-n-drop p').html('Loading...');
   // Delay a bit to allow the DOM to load
   setTimeout(() => {
-    if (sessionStorage['currentImg']) {
-      let imgs = JSON.parse(sessionStorage['imgData']);
+    if (storage.currentImg) {
+      let imgs = storage.imgData;
       imgs.push(imgData);
-      sessionStorage['imgData'] = JSON.stringify(imgs);
+      storage.imgData = imgs;
 
-      let imgNorms = JSON.parse(sessionStorage['normalMaps']);
+      let imgNorms = storage.normalMaps;
       console.log('starting image norm calc...');
       normData = wasm_pkg.normal_map(imgData);
       console.log('finished');
       imgNorms.push(normData);
-      sessionStorage['normalMaps'] = JSON.stringify(imgNorms);
+      storage.normalMaps = imgNorms;
       currentImg = imgs.length - 1;
     } else {
       let arr = [imgData];
       currentImg = 0;
-      sessionStorage.setItem('imgData', JSON.stringify(arr));
+      storage.imgData = arr;
 
       console.log('starting first calc...');
       normData = wasm_pkg.normal_map(imgData);
       let normArr = [normData];
       console.log('finished first calc...');
-      sessionStorage.setItem('normalMaps', JSON.stringify(normArr));
+      storage.normalMaps = normArr;
     }
     $('#drag-n-drop').css('display', 'none');
-    sessionStorage.setItem('currentImg', currentImg);
+    storage.currentImg = currentImg;
     setCropBackground(currentImg);
     setCropNormalMap();
 
@@ -85,7 +86,7 @@ export function getCroppedImageData(gradIndex, imgType) {
   let exportCanvas = document.createElement('canvas');
   let ctx = exportCanvas.getContext('2d');
 
-  let imgs = JSON.parse(sessionStorage[imgType]);
+  let imgs = storage[imgType];
   let cropImgData = imgs[gradIndex];
   let croppedImg = document.createElement('img');
   croppedImg.src = cropImgData;
@@ -120,8 +121,8 @@ function loadNormalMapToImage(imgIndex) {
   let ctx = NORM_CANVAS.getContext('2d');
   ctx.clearRect(0, 0, NORM_CANVAS.width, NORM_CANVAS.height);
 
-  let normMaps = JSON.parse(sessionStorage['normalMaps']);
-  let currentNormalMapData = normMaps[sessionStorage['currentImg']];
+  let normMaps = storage.normalMaps;
+  let currentNormalMapData = normMaps[storage.currentImg];
   let normImg = document.createElement('img');
 
   $(normImg).on('load', () => {
@@ -150,7 +151,7 @@ export function getCroppedImageToSave(gradIndex, imgType) {
   let exportCanvas = document.createElement('canvas');
   let ctx = exportCanvas.getContext('2d');
 
-  let imgs = JSON.parse(sessionStorage[imgType]);
+  let imgs = storage.imgData;
   let cropImgData = imgs[gradIndex];
   let croppedImg = document.createElement('img');
   croppedImg.src = cropImgData;
@@ -179,7 +180,7 @@ function thumnailClickable(el) {
     let texThumbId = $(evt.target).parents('.texture-thumb').attr('id') || evt.target.id;
     let sliceIndex = texThumbId.lastIndexOf('-'); // Should be texture-thumb-<NUMBER>
     let imageIndex = texThumbId.substring(sliceIndex + 1);
-    sessionStorage['currentImg'] = imageIndex;
+    storage.currentImg = imageIndex;
     updateActiveThumbnail();
 
     setCropBackground(imageIndex);
@@ -206,7 +207,7 @@ export function createThumbnailSelector(index, imgData, normData) {
 export function updateActiveThumbnail() {
   $('.texture-thumb').removeClass('active');
   $('.texture-thumb').each((index, el) => {
-    if (el.id.includes(sessionStorage['currentImg'])) {
+    if (el.id.includes(storage.currentImg)) {
       $(el).addClass('active');
     }
   });
