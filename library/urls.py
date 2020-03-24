@@ -11,5 +11,6 @@ urlpatterns = [
     path('receive/', views.UploadFormView.as_view()),
     path('receive/success/', views.success),
     path('upload_cmap', views.upload_cmap),
+    path('pullFromRemoteLibrary/<str:host>/<str:uuid>', views.pullFromRemoteLibrary),
     path('', views.library, name='index'),
 ]

@@ -17,7 +17,7 @@
           <th><div height="{{height}}" onclick="ShowFamily('{{col}}');">{{col}}</div></th>
         {% else %}
           <td>
-	    <img onclick=AddSelection("{{col}}") src={% static '/Artifacts/'|add:col|add:'/thumbnail.png' %} alt="(none)" onError="this.onerror=null", width="{{width}}" height="{{height}}"> 
+	    <img draggable="true" ondragstart='event.dataTransfer.setData("uuid", "{{col}}"); event.dataTransfer.setData("host", location.host);' onclick=AddSelection("{{col}}") src={% static '/Artifacts/'|add:col|add:'/thumbnail.png' %} alt="(none)" onError="this.onerror=null", width="{{width}}" height="{{height}}"> 
           </td>
         {% endif %}
       {% endfor %}

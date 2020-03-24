@@ -54,6 +54,11 @@ class UploadFormView(FormView):
     else:
       return render(request, 'library/success.html', {})
 
+def pullFromRemoteLibrary(request, host, uuid):
+  print("ZZZ host " + host + " uuid " + uuid)
+  return HttpResponse("OK")
+
+
 def upload_cmap(request):
   if request.method == 'POST':
     form = Form(request.POST, request.FILES)
