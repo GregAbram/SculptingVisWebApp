@@ -74,11 +74,10 @@
     ev.preventDefault();
     var uuid = ev.dataTransfer.getData("uuid");
     var host = ev.dataTransfer.getData("host");
-    var url = host + '/library/pullFromRemoteLibrary/' + host + '/' + uuid;
-    alert("host " + host + " uuid " + uuid + " url " + url);
+    var url = '/library/pullFromRemoteLibrary/' + host + '/' + uuid;
     $.ajax({
      url: url,
-      success: function(data) { alert("OK"); },
+      success: function(data) { ShowArtifacts(); },
       failure: function(data) { alert("failed"); }
     });
   }
@@ -221,20 +220,22 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
   </dialog>
 </div>
 
-<table>
-  <tr>
-    <td width=600 valign="top">
-      <div ondrop="dropArtifact(event)" ondragover="allowDropArtifact(event)" name='grid'></div>
-    </td>
-    <td width=75></td>
-    <td valign="top">
-      <h1>Selections</h1>
-      <div id='selectionDiv'></div>
-      <input id='cselection' disabled type='button' value='Clear' onclick='ClearSelections()'>
-      <input id='dselection' disabled type='button' value='Download' onclick='DownloadSelection()'>
-      <input id='rselection' disabled type='button' value='Delete from Library' onclick='DeleteFromLibrary()'>
-    </td>
-  </tr>
-</table>
+<div ondrop="dropArtifact(event)" ondragover="allowDropArtifact(event)">
+  <table>
+    <tr>
+      <td width=600 valign="top">
+        <div name='grid'></div>
+      </td>
+      <td width=75></td>
+      <td valign="top">
+        <h1>Selections</h1>
+        <div id='selectionDiv'></div>
+        <input id='cselection' disabled type='button' value='Clear' onclick='ClearSelections()'>
+        <input id='dselection' disabled type='button' value='Download' onclick='DownloadSelection()'>
+        <input id='rselection' disabled type='button' value='Delete from Library' onclick='DeleteFromLibrary()'>
+      </td>
+    </tr>
+  </table>
+</div>
 
 </html>
