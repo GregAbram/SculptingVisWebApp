@@ -55,9 +55,31 @@ class UploadFormView(FormView):
       return render(request, 'library/success.html', {})
 
 def pullFromRemoteLibrary(request, host, uuid):
-  print("ZZZ host " + host + " uuid " + uuid)
+  mongo = MongoClient('localhost', 27017)
+  db = mongo.SculptingVis
+  collection = db[settings.MONGO_DBNAME]
+  members = list(collection.find({'uuid': uuid}))
+  if len(members) > 0:
+    print("DUPLICATE  + " + uuid);
+  else:
+    import urllib.request, io, tarfile, json
+    url = 'http://' + host + '/library/download/' + uuid
+    f = urllib.request.urlopen(url=url)
+    barray = f.read()
+    flo = io.BytesIO(barray)
+    tfile = tarfile.open(fileobj=flo, mode='r')
+    afile = ""
+    for i in tfile.getnames():
+      j = i.split('/')
+      if j[-1] == 'artifact.json':
+        uuid = j[0]
+        afile = settings.ARTIFACTS + '/' + i
+        break
+    tfile.extractall(path=settings.ARTIFACTS)
+    f = open(afile, 'r')
+    j = json.load(f)
+    collection.insert_one(j)
   return HttpResponse("OK")
-
 
 def upload_cmap(request):
   if request.method == 'POST':
