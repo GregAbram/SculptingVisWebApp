@@ -9,10 +9,6 @@ https://docs.djangoproject.com/en/3.0/howto/deployment/wsgi/
 
 import sys
 print("WSGI PYTHON VERSION", sys.version) 
-print("TEST wsgi.py")
-
-for i in sys.path:
-  print(">>", i)
 
 import os
 
