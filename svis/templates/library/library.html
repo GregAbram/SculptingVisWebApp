@@ -63,6 +63,22 @@
     document.getElementById('selectionDiv').appendChild(table);
   }
 
+  var hideArtifact = function(ev)
+  {
+    var uuid = ev.dataTransfer.getData("uuid");
+    var url = '/library/hideArtifact/' + uuid;
+    $.ajax({
+     url: url,
+       success: function(data) { ShowArtifacts(); },
+       failure: function(data) { alert("failed"); }
+    });
+  }
+
+  var selectedArtifact = function(ev, uuid)
+  {
+    alert(uuid + " " + ev.button);
+  }
+
   var allowDropArtifact = function(ev)
   {
     ev.preventDefault();
@@ -205,7 +221,7 @@ html, body {
       </td>
 {% if islocal == True %}
       <td>
-        <div id=exportZone ondrop="exportArtifact(event)" ondragover="allowDropArtifact(event)">
+        <div id=exportZone ondrop="exportArtifact(event)" ondragover="allowDropArtifact(event)"><small>
           <div>Export Zone</div>
             <table style='width: 100%'>
               <tr>
@@ -219,6 +235,11 @@ html, body {
           </div>
       </td>
 {% endif %}
+      <td>
+        <div ondrop="hideArtifact(event)" ondragover="allowDropArtifact(event)">
+          <img src="{% static "trash.png" %}" alt="trash" height="75" width="75">
+        </div>
+      </td>
     </tr>
   </table>
 </div>

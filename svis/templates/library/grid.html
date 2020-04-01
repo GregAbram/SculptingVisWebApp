@@ -18,7 +18,7 @@
           <th><div height="{{height}}" onclick="ShowFamily('{{col}}');">{{col}}</div></th>
         {% else %}
           <td>
-	    <img draggable="true" ondragstart="sendArtifact(event, '{{col}}')" onclick=alert('selection') src={% static '/Artifacts/'|add:col|add:'/thumbnail.png' %} alt="(none)" onError="this.onerror=null", width="{{width}}" height="{{height}}"> 
+	    <img draggable="true" ondragstart="sendArtifact(event, '{{col}}')" onclick="selectedArtifact(event, '{{col}}')" src={% static '/Artifacts/'|add:col|add:'/thumbnail.png' %} alt="(none)" onError="this.onerror=null", width="{{width}}" height="{{height}}"> 
           </td>
         {% endif %}
       {% endfor %}

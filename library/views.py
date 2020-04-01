@@ -20,15 +20,21 @@ from pymongo import MongoClient
 def artifact_name(i):
   return i['uuid']
 
+def hideArtifact(request, uuid):
+  mongo = MongoClient('localhost', 27017)
+  db = mongo.SculptingVis
+  collection = db[settings.MONGO_DBNAME]
+  collection.update({'uuid': uuid}, {'$set': {"hidden": True}})
+  print("UUID: ", uuid)
+  return HttpResponse("OK")
+
 def copyArtifactLocal(request, path, uuid):
   print("copy ", settings.ARTIFACTS + "/" + uuid, '/' + path)
   try:
     shutil.copytree(settings.ARTIFACTS + "/" + uuid, '/' + path)
-    print("OK")
+    return HttpResponse("OK")
   except:
-    print("ERR")
     return HttpResponse("copy failed")
-  return HttpResponse("OK")
 
 def pullFromRemoteLibrary(request, host, uuid):
   mongo = MongoClient('localhost', 27017)
@@ -78,13 +84,13 @@ def showtype(request, typ):
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
   tags = collection.distinct('tags')
-  families = collection.find({'type': typ}).distinct('family')
-  classes = collection.find({'type': typ}).distinct('class')
+  families = collection.find({'type': typ, 'hidden': False}).distinct('family')
+  classes = collection.find({'type': typ, 'hidden': False}).distinct('class')
   grid = [[""] + classes]
   for f in families:
     row = [f]
     for c in classes:
-      doc = collection.find_one({'type': typ, 'family': f, 'class': c})
+      doc = collection.find_one({'type': typ, 'family': f, 'class': c, 'hidden': False})
       if (doc):
         row.append(artifact_name(doc))
       else:
@@ -103,11 +109,11 @@ def showtypefam(request, typ, fam):
   mongo = MongoClient('localhost', 27017)
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
-  classes = collection.find({'type': typ}).distinct('class')
+  classes = collection.find({'type': typ, 'hidden': False}).distinct('class')
   columns = []
   maxl = 0
   for c in classes:
-    column = [artifact_name(c) for c in collection.find({'type': typ, 'family': fam, 'class': c})]
+    column = [artifact_name(c) for c in collection.find({'type': typ, 'family': fam, 'class': c, 'hidden': False})]
     if len(column) > maxl: maxl = len(column)
     columns.append(column)
   for i in range(len(columns)):
@@ -129,11 +135,11 @@ def showtypeclass(request, typ, clss):
   mongo = MongoClient('localhost', 27017)
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
-  families = collection.find({'type': typ}).distinct('family')
+  families = collection.find({'type': typ, 'hidden': False}).distinct('family')
   rows = []
   maxl = 0
   for f in families:
-    row = [artifact_name(c) for c in collection.find({'type': typ, 'family': f, 'class': clss})]
+    row = [artifact_name(c) for c in collection.find({'type': typ, 'family': f, 'class': clss, 'hidden': False})]
     if len(row) > maxl: maxl = len(row)
     rows.append(row)
   for i in range(len(rows)):
