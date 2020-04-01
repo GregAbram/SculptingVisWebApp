@@ -17,42 +17,18 @@ import tempfile
 
 from pymongo import MongoClient
 
-from .forms import UploadForm
-
 def artifact_name(i):
   return i['uuid']
 
-class UploadFormView(FormView):
-  form_class = UploadForm
-  template_name = 'upload.html'
-  success_url = 'success'
-
-  def post(self, request, *args, **kwargs):
-    form_class = self.get_form_class()
-    form = self.get_form(form_class)
-    object_type = form.data['type']
-    object_family = form.data['family']
-    object_class = form.data['clss']
-    doc = {'type': object_type, 'family': object_family, 'class': object_class}
-    mongo = MongoClient('localhost', 27017)
-    db = mongo.SculptingVis
-    collection = db[settings.MONGO_DBNAME]
-    members = list(collection.find(doc))
-    doc['uuid'] = str(uuid1())
-    doc['tags'] = []
-    collection.insert_one(doc)
-    dirname = settings.ARTIFACTS + '/' + artifact_name(doc) + '/'
-    os.mkdir(dirname)
-    files = request.FILES.getlist('files')
-    if form.is_valid():
-      for f in files:
-        with open(dirname + f.name, 'wb+') as destination:
-          print('file: ', f)
-          for chunk in f.chunks():
-              destination.write(chunk)
-      return HttpResponse('success')
-    else:
-      return render(request, 'library/success.html', {})
+def copyArtifactLocal(request, path, uuid):
+  print("copy ", settings.ARTIFACTS + "/" + uuid, '/' + path)
+  try:
+    shutil.copytree(settings.ARTIFACTS + "/" + uuid, '/' + path)
+    print("OK")
+  except:
+    print("ERR")
+    return HttpResponse("copy failed")
+  return HttpResponse("OK")
 
 def pullFromRemoteLibrary(request, host, uuid):
   mongo = MongoClient('localhost', 27017)
@@ -192,8 +168,11 @@ def deleteselectedartifacts(request, uuids):
   return HttpResponse('OK')
 
 def library(request):
-  uploadForm = UploadForm()
-  return render(request, 'library/library.html', {'uploadForm': uploadForm})
+  if request.META['SERVER_NAME'] == 'localhost' or request.META['SERVER_NAME'] == '127.0.0.1':
+    local = True
+  else:
+    local = False
+  return render(request, 'library/library.html', {'islocal': local})
 
 def success(request):
   return render(request, 'library/success.html', {})

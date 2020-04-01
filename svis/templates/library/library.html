@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -74,12 +73,41 @@
     ev.preventDefault();
     var uuid = ev.dataTransfer.getData("uuid");
     var host = ev.dataTransfer.getData("host");
-    var url = '/library/pullFromRemoteLibrary/' + host + '/' + uuid;
-    $.ajax({
-     url: url,
-      success: function(data) { ShowArtifacts(); },
-      failure: function(data) { alert("failed"); }
-    });
+    if (host == location.host)
+      alert('drag between same libraries' + uuid + host)
+    else
+    {
+      var url = '/library/pullFromRemoteLibrary/' + host + '/' + uuid;
+      $.ajax({
+       url: url,
+         success: function(data) { ShowArtifacts(); },
+         failure: function(data) { alert("failed"); }
+      });
+    }
+  }
+
+  var exportArtifact = function(ev)
+  {
+    if (document.getElementById('dropDir').value == '(required)' || document.getElementById('dropName').value == 'required')
+      alert("got to give me a destination directoty and name");
+    else
+    {
+      ev.preventDefault();
+      var uuid = ev.dataTransfer.getData('uuid');
+      var destination = document.getElementById('dropDir').value + '/' + document.getElementById('dropName').value;
+      var url = '/library/copyArtifactLocal/' + destination + '/' + uuid;
+      $.ajax({
+         url: url,
+         success: function(data) { document.getElementById('dropName').value = '(required)'; },
+         failure: function(data) { alert("failed"); }
+      });
+    }
+  }
+
+  var sendArtifact = function(event, uuid)
+  {
+    event.dataTransfer.setData("uuid", uuid);
+    event.dataTransfer.setData("host", location.host);
   }
 
   var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
@@ -92,44 +120,6 @@
   var ShowClass = function(i)  {
     $.get('/library/showtypeclass/' + artifact_type + '/' + i, "", function(data){  $('div[name="grid"]').html(data); }, "html");
   };
-
-  var AddSelection = function(name) {
-    if (selections.indexOf(name) === -1)
-      selections.push(name);
-    RenderSelections();
-  }
-
-  var RmSelection = function(name) {
-    tmp = [];
-    selections.forEach(function (uuid) {
-      if (uuid != name)
-        tmp.push(uuid);
-    });
-    selections = tmp;
-    RenderSelections();
-  }
-
-  var ClearSelections = function() {
-    selections = []
-    RenderSelections();
-  }
-
-  var DeleteFromLibrary = function() {
-    if (confirm("Are you sure? This will remove the artifact from the library and place it in a trash directory on the library server.   If it does so, it can be restored by a sys admin"))
-    {
-      $.get('/library/deleteselectedartifacts/' + selections.join(','), "", function(data){});
-      ClearSelections();
-      ShowArtifacts();
-    };
-  }
-
-  var DownloadSelection = function() {
-    const a = document.createElement('a');
-    document.body.appendChild(a);
-    a.href = "/library/download/" + selections.join(',');
-    a.click();
-    $('div[name="selections"]').html("");
-  }
 
   var ShowArtifacts = function() {
     $.get('/library/showtype/' + artifact_type, "", 
@@ -172,16 +162,6 @@
     ShowArtifacts();
   }
 
-  var ShowUploadDialog = function()
-  {
-    document.getElementById('UploadDialog').open = true;
-  }
-
-  var HideUploadDialog = function()
-  {
-    document.getElementById('UploadDialog').open = false;
-  }
-
   $(document).ready(function()
   {
 	ShowType('glyph');
@@ -200,42 +180,50 @@
 body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
 .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
 .fa-anchor,.fa-coffee {font-size:200px}
+html, body {
+    height: 100%;
+}
+#exportZone {
+  text-align: center;
+  vertical-align: middle;
+  height: 100%;
+  width: 100%;
+}
 </style>
 
-<div class="w3-bar w3-dark-grey w3-card w3-left-align w3-large">
-  <a id="glyph-selector" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-white" onclick="ShowType('glyph')">glyphs</a>
-  <a id="colormap-selector" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="ShowType('colormap')">colormaps</a>
-  <a id="texture-selector" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="ShowType('texture')">textures</a>
-  <a id="line-selector" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="ShowType('line')">lines</a>
-  <a class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white w3-right" onclick="ShowUploadDialog()">Upload</a>
-</div>
+<body>
 
-<div>
-  <dialog id=UploadDialog>
-    <form id="upload_form" enctype="multipart/form-data" action="receive/" method="post" target=xrsp> {% csrf_token %}
-       Choose Directory:  <input type="file" name="files[]" id="files" multiple directory="" webkitdirectory mozdirectory><br/>
-       <input type="submit" value="Upload">
-       <input type=button onclick=HideUploadDialog() value="Close">
-    </form>
-  </dialog>
-</div>
-
-<div ondrop="dropArtifact(event)" ondragover="allowDropArtifact(event)">
-  <table>
+<div style="outline: 1px solid black;">
+  <table style="width: 100%">
     <tr>
-      <td width=600 valign="top">
-        <div name='grid'></div>
+      <td>
+        <div class="w3-bar w3-dark-grey w3-card w3-left-align w3-large">
+          <a id="glyph-selector" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-white" onclick="ShowType('glyph')">glyphs</a>
+          <a id="colormap-selector" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="ShowType('colormap')">colormaps</a>
+    <a id="texture-selector" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="ShowType('texture')">textures</a>
+    <a id="line-selector" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="ShowType('line')">lines</a>
       </td>
-      <td width=75></td>
-      <td valign="top">
-        <h1>Selections</h1>
-        <div id='selectionDiv'></div>
-        <input id='cselection' disabled type='button' value='Clear' onclick='ClearSelections()'>
-        <input id='dselection' disabled type='button' value='Download' onclick='DownloadSelection()'>
-        <input id='rselection' disabled type='button' value='Delete from Library' onclick='DeleteFromLibrary()'>
+{% if islocal == True %}
+      <td>
+        <div id=exportZone ondrop="exportArtifact(event)" ondragover="allowDropArtifact(event)">
+          <div>Export Zone</div>
+            <table style='width: 100%'>
+              <tr>
+                <td>directory:</td>
+                <td><input id='dropDir' type='text' value='(required)'></td>
+              </tr><tr>
+                <td>name:</td>
+                <td><input id='dropName' type='text' value='(required)'></td>
+              </tr>
+            </table>
+          </div>
       </td>
+{% endif %}
     </tr>
   </table>
 </div>
 
+<div name='grid' style="height: 100%; overflow: auto" ondrop="dropArtifact(event)" ondragover="allowDropArtifact(event)"></div>
+
+</body>
 </html>

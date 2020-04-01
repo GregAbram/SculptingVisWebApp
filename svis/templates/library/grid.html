@@ -1,4 +1,5 @@
 {% load static %}
+
 <h1>{{label}} Artifacts</h1>
 <table>
   {% for row in grid %}
@@ -17,7 +18,7 @@
           <th><div height="{{height}}" onclick="ShowFamily('{{col}}');">{{col}}</div></th>
         {% else %}
           <td>
-	    <img draggable="true" ondragstart='event.dataTransfer.setData("uuid", "{{col}}"); event.dataTransfer.setData("host", location.host);' onclick=AddSelection("{{col}}") src={% static '/Artifacts/'|add:col|add:'/thumbnail.png' %} alt="(none)" onError="this.onerror=null", width="{{width}}" height="{{height}}"> 
+	    <img draggable="true" ondragstart="sendArtifact(event, '{{col}}')" onclick=alert('selection') src={% static '/Artifacts/'|add:col|add:'/thumbnail.png' %} alt="(none)" onError="this.onerror=null", width="{{width}}" height="{{height}}"> 
           </td>
         {% endif %}
       {% endfor %}
