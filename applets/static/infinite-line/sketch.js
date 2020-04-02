@@ -290,7 +290,7 @@ function draw() {
   text('How often to jump around?', jumpProbabilitySlider.x, 92);
   text('How well do jumps have to match?', goodJumpThreshSlider.x, 152);
   text('Minimum jump size in pixels?', minJumpSizeSlider.x, 212);
-  text(' of output texture?', texHeightInput.x, 272);
+  text('Height of output texture?', texHeightInput.x, 272);
 
   fill(255);
   text("Family?", 20, familyInput.y+12);
