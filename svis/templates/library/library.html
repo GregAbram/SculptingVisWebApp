@@ -76,7 +76,6 @@
 
   var selectedArtifact = function(ev, uuid)
   {
-    alert(uuid + " " + ev.button);
   }
 
   var allowDropArtifact = function(ev)
@@ -244,7 +243,7 @@ html, body {
   </table>
 </div>
 
-<div name='grid' style="height: 100%; overflow: auto" ondrop="dropArtifact(event)" ondragover="allowDropArtifact(event)"></div>
+<div name='grid' style="height: 100%; overflow: auto;" ondrop="dropArtifact(event)" ondragover="allowDropArtifact(event)"></div>
 
 </body>
 </html>
