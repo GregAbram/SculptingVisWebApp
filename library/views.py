@@ -25,7 +25,12 @@ def hideArtifact(request, uuid):
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
   collection.update({'uuid': uuid}, {'$set': {"hidden": True}})
-  print("UUID: ", uuid)
+  import json
+  f = open(settings.ARTIFACTS + '/' + uuid + '/artifact.json', 'r')
+  j = json.load(f)
+  j['hidden'] = True
+  f = open(settings.ARTIFACTS + '/' + uuid + '/artifact.json', 'w')
+  json.dump(j,f)
   return HttpResponse("OK")
 
 def copyArtifactLocal(request, path, uuid):
