@@ -88,9 +88,7 @@
     ev.preventDefault();
     var uuid = ev.dataTransfer.getData("uuid");
     var host = ev.dataTransfer.getData("host");
-    if (host == location.host)
-      alert('drag between same libraries' + uuid + host)
-    else
+    if (host != location.host)
     {
       var url = '/library/pullFromRemoteLibrary/' + host + '/' + uuid;
       $.ajax({

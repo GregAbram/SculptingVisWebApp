@@ -14,6 +14,7 @@ from wsgiref.util import FileWrapper
 import pdb
 import tarfile
 import tempfile
+import json
 
 from pymongo import MongoClient
 
@@ -25,7 +26,6 @@ def hideArtifact(request, uuid):
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
   collection.update({'uuid': uuid}, {'$set': {"hidden": True}})
-  import json
   f = open(settings.ARTIFACTS + '/' + uuid + '/artifact.json', 'r')
   j = json.load(f)
   j['hidden'] = True
@@ -47,7 +47,25 @@ def pullFromRemoteLibrary(request, host, uuid):
   collection = db[settings.MONGO_DBNAME]
   members = list(collection.find({'uuid': uuid}))
   if len(members) > 0:
-    print("DUPLICATE  + " + uuid);
+    print(uuid, "found here already")
+    m = members[0]
+    if m['hidden']:
+      import json
+      print("it was hidden...", settings.ARTIFACTS + "/" + uuid + "/artifact.json")
+      f = open(settings.ARTIFACTS + "/" + uuid + "/artifact.json")
+      try:
+        j = json.load(f)
+      except:
+        print('failed to load JSON')
+        return HttpResponse("OK")
+      f.close()
+      j['hidden'] = False
+      f = open(settings.ARTIFACTS + "/" + uuid + "/artifact.json", "w")
+      json.dump(j, f, indent=2, sort_keys=True)
+      f.close()
+      collection.replace_one({'uuid': uuid}, j)
+    else:
+      print("DUPLICATE  + " + uuid);
   else:
     import urllib.request, io, tarfile, json
     url = 'http://' + host + '/library/download/' + uuid
