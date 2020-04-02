@@ -290,7 +290,7 @@ function draw() {
   text('How often to jump around?', jumpProbabilitySlider.x, 92);
   text('How well do jumps have to match?', goodJumpThreshSlider.x, 152);
   text('Minimum jump size in pixels?', minJumpSizeSlider.x, 212);
-  text('Height of output texture?', texHeightInput.x, 272);
+  text(' of output texture?', texHeightInput.x, 272);
 
   fill(255);
   text("Family?", 20, familyInput.y+12);
@@ -313,7 +313,15 @@ function draw() {
     noStroke();
     textAlign(CENTER);
     text('Raw input (' + inputImg.width + "x" + inputImg.height + ")", inputStart + inputSize/2, margin/2);
-    image(inputImg, inputStart + inputSize/2 - inputImg.width/2, margin, inputImg.width, inputImg.height);
+    
+    // draw at the native resolution, but will run off the bottom of the screen
+    //image(inputImg, inputStart + inputSize/2 - inputImg.width/2, margin, inputImg.width, inputImg.height);
+
+    // scale the image so the whole thing fits inside the window
+    let h = canvas.height - 2*margin;
+    let scale = h / inputImg.height;
+    let w = scale * inputImg.width;
+    image(inputImg, inputStart + inputSize/2 - inputImg.width/2, margin, w, h);
 
     if ((!simMatReady) && (!justRepeatCheckbox.checked())) { // calcSimMatRow < inputImg.height
       calcOneRowOfSimMat();
