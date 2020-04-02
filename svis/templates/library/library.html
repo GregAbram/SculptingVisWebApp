@@ -204,6 +204,14 @@ html, body {
   height: 100%;
   width: 100%;
 }
+
+.trash {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  right: 0;
+}
+
 </style>
 
 <body>
@@ -235,15 +243,16 @@ html, body {
       </td>
 {% endif %}
       <td>
-        <div ondrop="hideArtifact(event)" ondragover="allowDropArtifact(event)">
-          <img src="{% static "trash.png" %}" alt="trash" height="75" width="75">
-        </div>
       </td>
     </tr>
   </table>
 </div>
 
 <div name='grid' style="height: 100%; overflow: auto;" ondrop="dropArtifact(event)" ondragover="allowDropArtifact(event)"></div>
+
+<div class=trash ondrop="hideArtifact(event)" ondragover="allowDropArtifact(event)">
+  <img src="{% static "trash.png" %}" alt="trash" height="75" width="75">
+</div>
 
 </body>
 </html>
