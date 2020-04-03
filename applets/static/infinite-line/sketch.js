@@ -313,7 +313,15 @@ function draw() {
     noStroke();
     textAlign(CENTER);
     text('Raw input (' + inputImg.width + "x" + inputImg.height + ")", inputStart + inputSize/2, margin/2);
-    image(inputImg, inputStart + inputSize/2 - inputImg.width/2, margin, inputImg.width, inputImg.height);
+    
+    // draw at the native resolution, but will run off the bottom of the screen
+    //image(inputImg, inputStart + inputSize/2 - inputImg.width/2, margin, inputImg.width, inputImg.height);
+
+    // scale the image so the whole thing fits inside the window
+    let h = canvas.height - 2*margin;
+    let scale = h / inputImg.height;
+    let w = scale * inputImg.width;
+    image(inputImg, inputStart + inputSize/2 - inputImg.width/2, margin, w, h);
 
     if ((!simMatReady) && (!justRepeatCheckbox.checked())) { // calcSimMatRow < inputImg.height
       calcOneRowOfSimMat();
