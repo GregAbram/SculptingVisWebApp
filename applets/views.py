@@ -45,10 +45,12 @@ def upload_glyph(request):
     object_family = metadata['family']
     object_class = metadata['class']
     print("BLENDER.......")
+    os.environ["PATH"] += os.pathsep + settings.BLENDER_PATH
     blender_args = ['/bin/bash']
     blender_args.append(settings.STATIC_ROOT + 'glyph-aligner/run_blender.sh')
     blender_args.append(settings.STATIC_ROOT + 'glyph-aligner/Automating_lod_mapping.py')
     blender_args.append(dirname + '/original.obj')
+    print("BLENDER command: ", ' '.join(blender_args))
     try:
       os.system(' '.join(blender_args))
     except:
@@ -59,7 +61,7 @@ def upload_glyph(request):
     a['tags'] = []
     a['family'] = object_family
     a['class'] = object_class
-    a['type'] = 'type'
+    a['type'] = 'glyph'
     a['artifactMaterials'] = { 'clay': True }
     a['artifactData'] = {
       'lods': [
