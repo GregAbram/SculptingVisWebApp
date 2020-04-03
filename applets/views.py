@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.shortcuts import render
@@ -16,31 +15,25 @@ import subprocess
 
 from .forms import UploadForm
 
-def artifact_name(i):
-  return i['uuid']
-
 def applets(request):
   return render(request, 'applets/applets.html', {})
 
 def load_applet(request, applet):
-  print("LOAD APPLET 1", applet)
   template = 'applets/' + applet + '.html'
   uploadForm = UploadForm()
-  print("LOAD APPLET 2", applet)
   return render(request, template, {'uploadForm': uploadForm})
 
 def upload_glyph(request):
+  print("UPLOAD GLYPH!")
   if request.method == 'POST':
-    print('UPLOAD start!')
+    print("A")
     form = Form(request.POST, request.FILES)
     metadata = json.loads(request.FILES['metadata'].read())
     obj = request.FILES['obj'].read()
     uuid = str(uuid1())
-    print('UPLOAD uuid', uuid)
+    print("B uuid", uuid)
     dirname = settings.STATIC_ROOT + '/Artifacts/' + uuid + '/'
-    print('UPLOAD dirname', dirname)
     os.mkdir(dirname)
-    print('UPLOAD destination dir created')
     f = open(dirname + '/original.obj', 'wb')
     f.write(obj)
     f.close()
@@ -48,22 +41,20 @@ def upload_glyph(request):
     f = open(dirname + '/thumbnail.png', 'wb')
     f.write(obj)
     f.close()
-    f = open('/home/gda/APACHE/tt.png', 'wb')
-    f.write(obj)
-    f.close()
+    print("C")
     object_family = metadata['family']
     object_class = metadata['class']
+    print("BLENDER.......")
     blender_args = ['/bin/bash']
     blender_args.append(settings.STATIC_ROOT + 'glyph-aligner/run_blender.sh')
     blender_args.append(settings.STATIC_ROOT + 'glyph-aligner/Automating_lod_mapping.py')
     blender_args.append(dirname + '/original.obj')
-    print('BLENDER args:', blender_args)
     try:
       os.system(' '.join(blender_args))
-      print('BLENDER OK')
     except:
       print('BLENDER could not be run')
     a = {'artist': 'Francesca Samsel', 'preview': 'thumbnail.png'}
+    a['hidden'] = False
     a['uuid'] = uuid
     a['tags'] = []
     a['family'] = object_family
@@ -71,82 +62,76 @@ def upload_glyph(request):
     a['type'] = 'type'
     a['artifactMaterials'] = { 'clay': True }
     a['artifactData'] = {
-	'lods': [
-	  {
-	    'mesh': 'LOD1.obj',
-	    'normal': 'LOD1.png'
-	  },
-	  {
-	    'mesh': 'LOD2.obj',
-	    'normal': 'LOD2.png'
-	  },
-	  {
-	    'mesh': 'LOD3.obj',
-	    'normal': 'LOD3.png'
-	  }
-        ]
-      }
+      'lods': [
+        {
+          'mesh': 'LOD1.obj',
+          'normal': 'LOD1.png'
+        },
+        {
+          'mesh': 'LOD2.obj',
+          'normal': 'LOD2.png'
+        },
+        {
+          'mesh': 'LOD3.obj',
+          'normal': 'LOD3.png'
+        }
+      ]
+    }
     f = open(dirname + '/artifact.json', 'w')
     f.write(json.dumps(a, sort_keys=True, indent=4))
     f.close()
     mongo = MongoClient('localhost', 27017)
     db = mongo.SculptingVis
     collection = db[settings.MONGO_DBNAME]
-    doc = {'type': 'glyph', 'family': object_family, 'class': object_class, 'uuid': uuid, 'tags': []}
-    collection.insert_one(doc)
+    collection.insert_one(a)
   return HttpResponse('OK')
 
 def upload_color_loom(request):
   if request.method == 'POST':
     form = Form(request.POST, request.FILES)
-    object_family = form.data['family']
-    object_class = form.data['clss']
+    metadata = json.loads(request.FILES['metadata'].read());
+    object_family = metadata['family']
+    object_class = metadata['class']
     tsize = json.loads(request.FILES['thumbnail_size'].read())
     tpix = request.FILES['thumbnail_pixels'].read()
     tpix = np.frombuffer(tpix, dtype='uint8').reshape((tsize['height'], tsize['width'], 4))[:,:,0:3]
     thumbnail = Image.fromarray(tpix)
     colormap = request.FILES['colormap'].read()
-    mongo = MongoClient('localhost', 27017)
-    db = mongo.SculptingVis
-    collection = db[settings.MONGO_DBNAME]
-    doc = {'type': 'colormap', 'family': object_family, 'class': object_class, 'uuid': str(uuid1()), 'tags': []}
-    print("COLOR LOOM adding", doc)
-    collection.insert_one(doc)
-    dirname = settings.STATIC_ROOT + '/Artifacts/' + artifact_name(doc) + '/'
+    uuid = str(uuid1())
+    dirname = settings.STATIC_ROOT + '/Artifacts/' + uuid + '/'
     os.mkdir(dirname)
     thumbnail.save(dirname + 'thumbnail.png')
     with open(dirname + 'colormap.xml', 'w') as d:
       for i in colormap.decode('utf-8').split(','):
         d.write(i)
     a = {'artist': 'Francesca Samsel', 'preview': 'thumbnail.png'}
-    a['uuid'] = doc['uuid']
-    a['tags'] = doc['tags']
-    a['family'] = doc['family']
-    a['class'] = doc['class']
-    a['type'] = doc['type']
+    a['hidden'] = False
+    a['uuid'] = uuid
+    a['tags'] = []
+    a['family'] = object_family
+    a['class'] = object_class
+    a['type'] = 'colormap'
     a['artifactData'] = {'colormap': 'colormap.xml'}
     f = open(dirname + 'artifact.json', 'w')
     f.write(json.dumps(a, sort_keys=True, indent=4))
     f.close()
+    mongo = MongoClient('localhost', 27017)
+    db = mongo.SculptingVis
+    collection = db[settings.MONGO_DBNAME]
+    collection.insert_one(a)
 
   return HttpResponse('OK')
 
 def upload_infinite_line(request):
   if request.method == 'POST':
     form = Form(request.POST, request.FILES)
-
     metadata = json.loads(request.FILES['metadata'].read());
     object_family = metadata['family']
     object_class = metadata['class']
-
     names = json.loads(request.FILES['names'].read());
-    mongo = MongoClient('localhost', 27017)
-    db = mongo.SculptingVis
-    collection = db[settings.MONGO_DBNAME]
-    doc = {'type': 'line', 'family': object_family, 'class': object_class, 'uuid': str(uuid1()), 'tags': []}
-    collection.insert_one(doc)
 
-    dirname = settings.STATIC_ROOT + '/Artifacts/' + artifact_name(doc) + '/'
+    uuid = str(uuid1())
+    dirname = settings.STATIC_ROOT + '/Artifacts/' + uuid + '/'
     os.mkdir(dirname)
 
     tsize = json.loads(request.FILES['thumbnail_size'].read())
@@ -163,15 +148,20 @@ def upload_infinite_line(request):
       png.save(dirname + name + '.png')
 
     a = {'artist': 'Francesca Samsel', 'preview': 'thumbnail.png'}
-    a['uuid'] = doc['uuid']
-    a['tags'] = doc['tags']
-    a['family'] = doc['family']
-    a['class'] = doc['class']
-    a['type'] = doc['type']
+    a['hidden'] = False
+    a['uuid'] = uuid
+    a['tags'] = []
+    a['family'] = object_family
+    a['class'] = object_class
+    a['type'] = 'line'
     a['artifactData'] = {'vertical': 'vertical.png', 'horizontal': 'horizontal.png'}
     f = open(dirname + 'artifact.json', 'w')
     f.write(json.dumps(a, sort_keys=True, indent=4))
     f.close()
+    mongo = MongoClient('localhost', 27017)
+    db = mongo.SculptingVis
+    collection = db[settings.MONGO_DBNAME]
+    collection.insert_one(a)
 
   return HttpResponse('OK')
 
@@ -184,13 +174,8 @@ def upload_texture_looper(request):
 
     names = json.loads(request.FILES['names'].read());
 
-    mongo = MongoClient('localhost', 27017)
-    db = mongo.SculptingVis
-    collection = db[settings.MONGO_DBNAME]
-    doc = {'type': 'texture', 'family': object_family, 'class': object_class, 'uuid': str(uuid1()), 'tags': []}
-    collection.insert_one(doc)
-
-    dirname = settings.STATIC_ROOT + '/Artifacts/' + artifact_name(doc) + '/'
+    uuid = str(uuid1())
+    dirname = settings.STATIC_ROOT + '/Artifacts/' + uuid + '/'
     os.mkdir(dirname)
 
     tsize = json.loads(request.FILES['thumbnail_size'].read())
@@ -207,15 +192,21 @@ def upload_texture_looper(request):
       png.save(dirname + name + '.png')
 
     a = {'artist': 'Francesca Samsel', 'preview': 'thumbnail.png'}
-    a['uuid'] = doc['uuid']
-    a['tags'] = doc['tags']
-    a['family'] = doc['family']
-    a['class'] = doc['class']
-    a['type'] = doc['type']
+    a['hidden'] = False
+    a['uuid'] = str(uuid1())
+    a['tags'] = []
+    a['family'] = object_family
+    a['class'] = object_class
+    a['type'] = 'texture'
     a['artifactData'] = {'image': 'texturemap_0.png', 'normalmap': 'normalmap_0.png'}
     f = open(dirname + 'artifact.json', 'w')
     f.write(json.dumps(a, sort_keys=True, indent=4))
     f.close()
+
+    mongo = MongoClient('localhost', 27017)
+    db = mongo.SculptingVis
+    collection = db[settings.MONGO_DBNAME]
+    collection.insert_one(a)
 
   return HttpResponse('OK')
 
@@ -234,10 +225,9 @@ class UploadFormView(FormView):
     mongo = MongoClient('localhost', 27017)
     db = mongo.SculptingVis
     collection = db[settings.MONGO_DBNAME]
-    doc['uuid'] = str(uuid1())
-    doc['tags'] = []
     collection.insert_one(doc)
-    dirname = settings.STATIC_ROOT + '/Artifacts/' + artifact_name(doc) + '/'
+    uuid = str(uuid1())
+    dirname = settings.STATIC_ROOT + '/Artifacts/' + uuid + '/'
     os.mkdir(dirname)
     files = request.FILES.getlist('files')
     if form.is_valid():

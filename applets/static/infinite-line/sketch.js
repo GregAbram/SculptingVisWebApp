@@ -457,6 +457,8 @@ function saveToLibrary() {
 
   fd.append('names', new Blob([JSON.stringify(names)]));
 
+  print("XXXXXXXXXXXXXXX");
+
   var msg = $.ajax({
     headers: { "X-CSRFToken": csrftoken },
     url: '/applets/upload_infinite_line/',
@@ -466,6 +468,7 @@ function saveToLibrary() {
     contentType: false,
     processData: false,
     enctype: 'multipart/form-data',
+    success: function(ok) { alert("ok"); },
     error: function (error) {
       console.log(error);
     }
