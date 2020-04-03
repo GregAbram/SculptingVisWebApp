@@ -19,16 +19,35 @@
   </head>
   <body>
 
-    <dialog id=UploadDialog>
-      <form id="upload_form">
-        <table>
-          {{ uploadForm }}
-        </table>
-        <input type="button" onclick='upload(event)' value="Upload">
-        <input type=button onclick="(function() { document.getElementById('UploadDialog').open = false;})()" value="Close">
-      </form>
-      <iframe name=xrsp height=32></iframe>
-    </dialog>
+  <dialog id=UploadDialog style="z-index: 1">
+    <table>
+      <tr>
+        <td>
+          Family?
+        </td>
+        <td>
+          <input id=colorLooperFamily type=text value='(required)'>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Class?
+        </td>
+        <td>
+          <input id=colorLooperClass type=text value='(required)'>
+        </td>
+      </tr>
+      <tr>
+      <td></td>
+        <td align=right>
+          <div>
+            <input type="button" onclick='upload(event)' value="OK">
+            <input type=button onclick="(function() { document.getElementById('UploadDialog').open = false;})()" value="Cancel">
+          </div>
+        </td>
+      </tr>
+    </table>
+  </dialog>
 
     <script src="{% static 'color-loom/sketch.js' %}"></script>    
 

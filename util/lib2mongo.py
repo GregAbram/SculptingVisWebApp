@@ -24,4 +24,4 @@ for a in glob(ldir + '/*/artifact.json'):
     j = json.load(f)
     sv[dbname].insert_one(j)
   except:
-    print("Error in " + uuid)
+    print("Error in " + a)
