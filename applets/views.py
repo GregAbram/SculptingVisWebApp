@@ -195,7 +195,7 @@ def upload_texture_looper(request):
 
     a = {'artist': 'Francesca Samsel', 'preview': 'thumbnail.png'}
     a['hidden'] = False
-    a['uuid'] = str(uuid1())
+    a['uuid'] = uuid
     a['tags'] = []
     a['family'] = object_family
     a['class'] = object_class
