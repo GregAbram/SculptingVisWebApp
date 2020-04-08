@@ -24,14 +24,11 @@ def load_applet(request, applet):
   return render(request, template, {'uploadForm': uploadForm})
 
 def upload_glyph(request):
-  print("UPLOAD GLYPH!")
   if request.method == 'POST':
-    print("A")
     form = Form(request.POST, request.FILES)
     metadata = json.loads(request.FILES['metadata'].read())
     obj = request.FILES['obj'].read()
     uuid = str(uuid1())
-    print("B uuid", uuid)
     dirname = settings.STATIC_ROOT + '/Artifacts/' + uuid + '/'
     os.mkdir(dirname)
     f = open(dirname + '/original.obj', 'wb')
@@ -41,10 +38,8 @@ def upload_glyph(request):
     f = open(dirname + '/thumbnail.png', 'wb')
     f.write(obj)
     f.close()
-    print("C")
     object_family = metadata['family']
     object_class = metadata['class']
-    print("BLENDER.......")
     os.environ["PATH"] += os.pathsep + settings.BLENDER_PATH
     blender_args = ['/bin/bash']
     blender_args.append(settings.STATIC_ROOT + 'glyph-aligner/run_blender.sh')
@@ -94,14 +89,15 @@ def upload_color_loom(request):
     metadata = json.loads(request.FILES['metadata'].read());
     object_family = metadata['family']
     object_class = metadata['class']
-    tsize = json.loads(request.FILES['thumbnail_size'].read())
-    tpix = request.FILES['thumbnail_pixels'].read()
-    tpix = np.frombuffer(tpix, dtype='uint8').reshape((tsize['height'], tsize['width'], 4))[:,:,0:3]
-    thumbnail = Image.fromarray(tpix)
     colormap = request.FILES['colormap'].read()
     uuid = str(uuid1())
     dirname = settings.STATIC_ROOT + '/Artifacts/' + uuid + '/'
     os.mkdir(dirname)
+    tsize = json.loads(request.FILES['thumbnail_size'].read())
+    tpix = request.FILES['thumbnail_pixels'].read()
+    tpix = np.frombuffer(tpix, dtype='uint8').reshape((tsize['height'], tsize['width'], 4))[:,:,0:3]
+    thumbnail = Image.fromarray(tpix)
+    thumbnail = thumbnail.resize((200, 30))
     thumbnail.save(dirname + 'thumbnail.png')
     with open(dirname + 'colormap.xml', 'w') as d:
       for i in colormap.decode('utf-8').split(','):
@@ -136,18 +132,16 @@ def upload_infinite_line(request):
     dirname = settings.STATIC_ROOT + '/Artifacts/' + uuid + '/'
     os.mkdir(dirname)
 
-    tsize = json.loads(request.FILES['thumbnail_size'].read())
-    tpix = request.FILES['thumbnail_pixels'].read()
-    tpix = np.frombuffer(tpix, dtype='uint8').reshape((tsize['height'], tsize['width'], 4))[:,:,0:3]
-    thumbnail = Image.fromarray(tpix)
-    thumbnail.save(dirname + 'thumbnail.png')
-
     for name in names:
       tsize = json.loads(request.FILES[name + '_size'].read())
       tpix = request.FILES[name + '_pixels'].read()
       tpix = np.frombuffer(tpix, dtype='uint8').reshape((tsize['height'], tsize['width'], 4))[:,:,0:3]
       png = Image.fromarray(tpix)
       png.save(dirname + name + '.png')
+
+    thumbnail = Image.open(dirname + '/horizontal.png')
+    thumbnail = thumbnail.resize((int(thumbnail.size[0] * (40.0 / thumbnail.size[1])), 40))
+    thumbnail.save(dirname + 'thumbnail.png')
 
     a = {'artist': 'Francesca Samsel', 'preview': 'thumbnail.png'}
     a['hidden'] = False
@@ -180,18 +174,17 @@ def upload_texture_looper(request):
     dirname = settings.STATIC_ROOT + '/Artifacts/' + uuid + '/'
     os.mkdir(dirname)
 
-    tsize = json.loads(request.FILES['thumbnail_size'].read())
-    tpix = request.FILES['thumbnail_pixels'].read()
-    tpix = np.frombuffer(tpix, dtype='uint8').reshape((tsize['height'], tsize['width'], 4))[:,:,0:3]
-    thumbnail = Image.fromarray(tpix)
-    thumbnail.save(dirname + 'thumbnail.png')
-
     for name in names:
       tsize = json.loads(request.FILES[name + '_size'].read())
       tpix = request.FILES[name + '_pixels'].read()
       tpix = np.frombuffer(tpix, dtype='uint8').reshape((tsize['height'], tsize['width'], 4))[:,:,0:3]
       png = Image.fromarray(tpix)
       png.save(dirname + name + '.png')
+
+    thumbnail = Image.open(dirname + '/texturemap_0.png')
+    thumbnail = thumbnail.resize((int(thumbnail.size[0] * (100.0 / thumbnail.size[1])), 100))
+    print("XXXXXXXX ", thumbnail.size)
+    thumbnail.save(dirname + '/thumbnail.png')
 
     a = {'artist': 'Francesca Samsel', 'preview': 'thumbnail.png'}
     a['hidden'] = False
@@ -235,7 +228,6 @@ class UploadFormView(FormView):
     if form.is_valid():
       for f in files:
         with open(dirname + f.name, 'wb+') as destination:
-          print('file: ', f)
           for chunk in f.chunks():
               destination.write(chunk)
       return HttpResponse('success')
