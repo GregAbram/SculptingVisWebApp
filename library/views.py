@@ -121,7 +121,7 @@ def showtype(request, typ):
     grid.append(row)
   if typ == 'colormap' or typ == 'line':
     wid = 200
-    ht = 40
+    ht = 45
   else:
     wid = 100
     ht = 100
@@ -147,7 +147,7 @@ def showtypefam(request, typ, fam):
     grid.append(row)
   if typ == 'colormap' or typ == 'line':
     wid = 200
-    ht = 40
+    ht = 45
   else:
     wid = 100
     ht = 100
@@ -174,7 +174,7 @@ def showtypeclass(request, typ, clss):
     grid.append(rows[i])
   if typ == 'colormap' or typ == 'line':
     wid = 200
-    ht = 40
+    ht = 45
   else:
     wid = 100
     ht = 100

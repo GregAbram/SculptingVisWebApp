@@ -457,15 +457,10 @@ function saveToLibrary() {
   fd.append(name + '_pixels', new Blob([horizImg.pixels], {'type': 'image/png'}));
   names.push(name);
 
-  fd.append('thumbnail_size', new Blob([JSON.stringify({'width': horizImg.width, 'height': horizImg.height})], {type: "text"}));
-  fd.append('thumbnail_pixels', new Blob([horizImg.pixels], {'type': 'image/png'}));
-
   metadata = {'family': familyInput.value(), 'class': classInput.value()}
   fd.append('metadata', new Blob([JSON.stringify(metadata)], {type: "text"}));
 
   fd.append('names', new Blob([JSON.stringify(names)]));
-
-  print("XXXXXXXXXXXXXXX");
 
   var msg = $.ajax({
     headers: { "X-CSRFToken": csrftoken },
