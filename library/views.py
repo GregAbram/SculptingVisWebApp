@@ -14,45 +14,77 @@ from wsgiref.util import FileWrapper
 import pdb
 import tarfile
 import tempfile
+import json
 
 from pymongo import MongoClient
-
-from .forms import UploadForm
 
 def artifact_name(i):
   return i['uuid']
 
-class UploadFormView(FormView):
-  form_class = UploadForm
-  template_name = 'upload.html'
-  success_url = 'success'
+def hideArtifact(request, uuid):
+  mongo = MongoClient('localhost', 27017)
+  db = mongo.SculptingVis
+  collection = db[settings.MONGO_DBNAME]
+  collection.update({'uuid': uuid}, {'$set': {"hidden": True}})
+  f = open(settings.ARTIFACTS + '/' + uuid + '/artifact.json', 'r')
+  j = json.load(f)
+  j['hidden'] = True
+  f = open(settings.ARTIFACTS + '/' + uuid + '/artifact.json', 'w')
+  json.dump(j,f)
+  return HttpResponse("OK")
 
-  def post(self, request, *args, **kwargs):
-    form_class = self.get_form_class()
-    form = self.get_form(form_class)
-    object_type = form.data['type']
-    object_family = form.data['family']
-    object_class = form.data['clss']
-    doc = {'type': object_type, 'family': object_family, 'class': object_class}
-    mongo = MongoClient('localhost', 27017)
-    db = mongo.SculptingVis
-    collection = db[settings.MONGO_DBNAME]
-    members = list(collection.find(doc))
-    doc['uuid'] = str(uuid1())
-    doc['tags'] = []
-    collection.insert_one(doc)
-    dirname = settings.ARTIFACTS + '/' + artifact_name(doc) + '/'
-    os.mkdir(dirname)
-    files = request.FILES.getlist('files')
-    if form.is_valid():
-      for f in files:
-        with open(dirname + f.name, 'wb+') as destination:
-          print('file: ', f)
-          for chunk in f.chunks():
-              destination.write(chunk)
-      return HttpResponse('success')
+def copyArtifactLocal(request, path, uuid):
+  print("copy ", settings.ARTIFACTS + "/" + uuid, '/' + path)
+  try:
+    shutil.copytree(settings.ARTIFACTS + "/" + uuid, '/' + path)
+    return HttpResponse("OK")
+  except:
+    return HttpResponse("copy failed")
+
+def pullFromRemoteLibrary(request, host, uuid):
+  mongo = MongoClient('localhost', 27017)
+  db = mongo.SculptingVis
+  collection = db[settings.MONGO_DBNAME]
+  members = list(collection.find({'uuid': uuid}))
+  if len(members) > 0:
+    print(uuid, "found here already")
+    m = members[0]
+    if m['hidden']:
+      import json
+      print("it was hidden...", settings.ARTIFACTS + "/" + uuid + "/artifact.json")
+      f = open(settings.ARTIFACTS + "/" + uuid + "/artifact.json")
+      try:
+        j = json.load(f)
+      except:
+        print('failed to load JSON')
+        return HttpResponse("OK")
+      f.close()
+      j['hidden'] = False
+      f = open(settings.ARTIFACTS + "/" + uuid + "/artifact.json", "w")
+      json.dump(j, f, indent=2, sort_keys=True)
+      f.close()
+      collection.replace_one({'uuid': uuid}, j)
     else:
-      return render(request, 'library/success.html', {})
+      print("DUPLICATE  + " + uuid);
+  else:
+    import urllib.request, io, tarfile, json
+    url = 'http://' + host + '/library/download/' + uuid
+    f = urllib.request.urlopen(url=url)
+    barray = f.read()
+    flo = io.BytesIO(barray)
+    tfile = tarfile.open(fileobj=flo, mode='r')
+    afile = ""
+    for i in tfile.getnames():
+      j = i.split('/')
+      if j[-1] == 'artifact.json':
+        uuid = j[0]
+        afile = settings.ARTIFACTS + '/' + i
+        break
+    tfile.extractall(path=settings.ARTIFACTS)
+    f = open(afile, 'r')
+    j = json.load(f)
+    collection.insert_one(j)
+  return HttpResponse("OK")
 
 def upload_cmap(request):
   if request.method == 'POST':
@@ -75,13 +107,13 @@ def showtype(request, typ):
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
   tags = collection.distinct('tags')
-  families = collection.find({'type': typ}).distinct('family')
-  classes = collection.find({'type': typ}).distinct('class')
+  families = collection.find({'type': typ, 'hidden': False}).distinct('family')
+  classes = collection.find({'type': typ, 'hidden': False}).distinct('class')
   grid = [[""] + classes]
   for f in families:
     row = [f]
     for c in classes:
-      doc = collection.find_one({'type': typ, 'family': f, 'class': c})
+      doc = collection.find_one({'type': typ, 'family': f, 'class': c, 'hidden': False})
       if (doc):
         row.append(artifact_name(doc))
       else:
@@ -89,7 +121,7 @@ def showtype(request, typ):
     grid.append(row)
   if typ == 'colormap' or typ == 'line':
     wid = 200
-    ht = 40
+    ht = 45
   else:
     wid = 100
     ht = 100
@@ -100,11 +132,11 @@ def showtypefam(request, typ, fam):
   mongo = MongoClient('localhost', 27017)
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
-  classes = collection.find({'type': typ}).distinct('class')
+  classes = collection.find({'type': typ, 'hidden': False}).distinct('class')
   columns = []
   maxl = 0
   for c in classes:
-    column = [artifact_name(c) for c in collection.find({'type': typ, 'family': fam, 'class': c})]
+    column = [artifact_name(c) for c in collection.find({'type': typ, 'family': fam, 'class': c, 'hidden': False})]
     if len(column) > maxl: maxl = len(column)
     columns.append(column)
   for i in range(len(columns)):
@@ -115,7 +147,7 @@ def showtypefam(request, typ, fam):
     grid.append(row)
   if typ == 'colormap' or typ == 'line':
     wid = 200
-    ht = 40
+    ht = 45
   else:
     wid = 100
     ht = 100
@@ -126,11 +158,11 @@ def showtypeclass(request, typ, clss):
   mongo = MongoClient('localhost', 27017)
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
-  families = collection.find({'type': typ}).distinct('family')
+  families = collection.find({'type': typ, 'hidden': False}).distinct('family')
   rows = []
   maxl = 0
   for f in families:
-    row = [artifact_name(c) for c in collection.find({'type': typ, 'family': f, 'class': clss})]
+    row = [artifact_name(c) for c in collection.find({'type': typ, 'family': f, 'class': clss, 'hidden': False})]
     if len(row) > maxl: maxl = len(row)
     rows.append(row)
   for i in range(len(rows)):
@@ -142,7 +174,7 @@ def showtypeclass(request, typ, clss):
     grid.append(rows[i])
   if typ == 'colormap' or typ == 'line':
     wid = 200
-    ht = 40
+    ht = 45
   else:
     wid = 100
     ht = 100
@@ -165,8 +197,11 @@ def deleteselectedartifacts(request, uuids):
   return HttpResponse('OK')
 
 def library(request):
-  uploadForm = UploadForm()
-  return render(request, 'library/library.html', {'uploadForm': uploadForm})
+  if request.META['SERVER_NAME'] == 'localhost' or request.META['SERVER_NAME'] == '127.0.0.1':
+    local = True
+  else:
+    local = False
+  return render(request, 'library/library.html', {'islocal': local})
 
 def success(request):
   return render(request, 'library/success.html', {})

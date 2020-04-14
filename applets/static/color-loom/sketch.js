@@ -231,10 +231,12 @@ function setup() {
   cmap = buildColorMapFromSwatches(cmapSwatches, border, cmapPanelRect.h-border);
   */
 
-  let saveButton = createButton('Save and Download');
+  let saveButton = createButton('Save To Library');
   saveButton.position(cmapPanelRect.x + cmapPanelRect.w/2 - 100, 60);
   saveButton.size(200, 20);
   saveButton.mousePressed(saveAndDownload);
+
+
 
 
   /**
@@ -799,36 +801,31 @@ function saveAndDownload() {
   colormap.push('</ColorMap>');
   colormap.push('</ColorMaps>');
 
-  /*  start of work on state saving...
-  
-  console.log(JSON.stringify(srcImageRects));
-  appstate = [];
-  appstate.push("<ColorLoomState>")
-  appstate.push('<Sources>');
 
-  for (i=0; i<srcImageRects.length; i++) {
-    appstate.push('<Image >')
-    image(srcImages[i], srcImageRects[i].x, srcImageRects[i].y, srcImageRects[i].w, srcImageRects[i].h);
-  }
-
-  appstate.push('</Sources>');
-
-  // no need to save the right hand side because that's captured by
-  // the colormap xml that is already saved.
-
-  appstate.push("</ColorLoomState>")
-  */
-
+  document.getElementById('colorLooperFamily').value = "(required)";
+  document.getElementById('colorLooperClass').value = "(required)";
   document.getElementById('UploadDialog').open = true;
 }
 
 function upload(event)
 {
-  var form = document.getElementById('upload_form');
-  var fd = new FormData(form);
+  f = document.getElementById('colorLooperFamily').value;
+  c = document.getElementById('colorLooperClass').value;
+
+  if (f == '(required)' || c == '(required)')
+  {
+    alert('please enter family and class');
+    return;
+  }
+
+  var fd = new FormData();
+
+  metadata = {'family': f, 'class': c}
+  fd.append('metadata', new Blob([JSON.stringify(metadata)], {type: "text"}));
 
   fd.append("colormap", new Blob([colormap.join()]));
-  fd.append("thumbnail_size", new Blob([JSON.stringify({'width': thumbnail.width, 'height': thumbnail.height})],  { type: "text"}));
+  metadata = {'width': thumbnail.width, 'height': thumbnail.height}
+  fd.append("thumbnail_size", new Blob([JSON.stringify(metadata)],  {type: "text"}));
 
   var b = new Blob([thumbnail.pixels], {type: "image/png"});
   fd.append("thumbnail_pixels", b);
@@ -842,9 +839,8 @@ function upload(event)
       contentType: false,
       processData: false,
       enctype: 'multipart/form-data',
-      error: function (error) {
-        console.log(error);
-      }
+      success: function(ok) { document.getElementById('UploadDialog').open = false; },
+      error: function (error) { console.log(error); }
   });
 }
 

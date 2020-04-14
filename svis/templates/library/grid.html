@@ -1,4 +1,11 @@
 {% load static %}
+
+<style>
+  .thumbnail::-webkit-scrollbar { height: 5px; }
+  .thumbnail::-webkit-scrollbar-track { background: transparent; }
+  .thumbnail::-webkit-scrollbar-thumb { background: lightgrey; }
+</style>
+
 <h1>{{label}} Artifacts</h1>
 <table>
   {% for row in grid %}
@@ -6,7 +13,7 @@
     {% if forloop.first %}
       {% for col in row %}
         {% if forloop.first %}
-          <th width="{{width}}", height="{{height}}"><div onclick="ShowArtifacts();">All</div></th>
+          <th><div onclick="ShowArtifacts();">All</div></th>
         {% else %}
           <th><div onclick="ShowClass('{{col}}');">{{col}}</div></th>
         {% endif %}
@@ -14,10 +21,15 @@
     {% else %}
       {% for col in row %}
         {% if forloop.first %}
-          <th><div height="{{height}}" onclick="ShowFamily('{{col}}');">{{col}}</div></th>
+          <th><div onclick="ShowFamily('{{col}}');">{{col}}</div></th>
         {% else %}
           <td>
-	    <img onclick=AddSelection("{{col}}") src={% static '/Artifacts/'|add:col|add:'/thumbnail.png' %} alt="(none)" onError="this.onerror=null", width="{{width}}" height="{{height}}"> 
+            <div class=thumbnail style="width: {{width}}px; height: {{height}}px; overflow-x: scroll; overflow-y: hidden">
+              <img draggable="true" ondragstart="sendArtifact(event, '{{col}}')" 
+                   onclick="selectedArtifact(event, '{{col}}')" 
+                   src={% static '/Artifacts/'|add:col|add:'/thumbnail.png' %} 
+                   alt="(none)" onError="this.onerror=null">
+            </div>
           </td>
         {% endif %}
       {% endfor %}

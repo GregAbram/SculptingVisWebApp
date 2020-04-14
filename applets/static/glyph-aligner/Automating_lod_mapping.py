@@ -182,7 +182,7 @@ if bpy.context.selected_objects != []:
 		lod0.select = False
 
 		img = bpy.data.images['Lod' + str(i)]
-		img.filepath_raw = os.path.join(outputDir,  'normlmaps/LOD' + str(i) + '.png')
+		img.filepath_raw = os.path.join(outputDir,  'normalmaps/LOD' + str(i) + '.png')
 		img.file_format = 'PNG'
 		img.save_render(img.filepath_raw)
 		print("Finished baking normal maps")

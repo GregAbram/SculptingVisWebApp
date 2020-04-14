@@ -67,12 +67,6 @@ function setup() {
 
       fd.append(name + '_size', new Blob([JSON.stringify({'width': imageData.width, 'height': imageData.height})], {type: "text"}));
       fd.append(name + '_pixels', new Blob([imageData.data], {'type': 'image/png'}));
-
-      if (i == 0)
-      {
-        fd.append('thumbnail_size', new Blob([JSON.stringify({'width': imageData.width, 'height': imageData.height})], {type: "text"}));
-        fd.append('thumbnail_pixels', new Blob([imageData.data], {'type': 'image/png'}));
-      }
     }
 
     let normalMaps = storage.normalMaps;

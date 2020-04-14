@@ -17,17 +17,11 @@ print(sv, sv.list_collection_names())
 if dbname in sv.list_collection_names():
   sv.drop_collection(dbname)
 
-for uuid in glob(ldir + '/*'):
-  if uuid != ldir + "/none":
-    print(uuid)
-    f = open(uuid + '/artifact.json')
+for a in glob(ldir + '/*/artifact.json'):
+  print(a)
+  try:
+    f = open(a)
     j = json.load(f)
-    f.close()
-    d = {
-      "class": j['class'],
-      "family": j['family'],
-      "uuid": j['uuid'],
-      "type": j['type'],
-      "tags": []
-    }
-    sv[dbname].insert_one(d)
+    sv[dbname].insert_one(j)
+  except:
+    print("Error in " + a)
