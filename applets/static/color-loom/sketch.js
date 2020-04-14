@@ -725,9 +725,17 @@ function gotFile(p5file) {
 function newInputLoaded() {
   srcImages.push(droppedImg);
   srcImages[srcImages.length-1].loadPixels();
-  var h = 0.2*srcPanelRect.h
-  var s = h / droppedImg.height;
-  var r = new Rect(border, border + srcImageRects.length*(h+2*border), s*droppedImg.width, s*droppedImg.height);
+  var maxh = 0.2*srcPanelRect.h;
+  var maxw = 0.3*srcPanelRect.w;
+  var s = maxh / droppedImg.height;
+  var h = maxh;
+  var w = s*droppedImg.width;
+  if (w > maxw) {
+    s = maxw / droppedImg.width;
+    w = maxw;
+    h = s*droppedImg.height;
+  }
+  var r = new Rect(border, border + srcImageRects.length*(maxh+2*border), s*droppedImg.width, s*droppedImg.height);
   srcImageRects.push(r);
   srcNumSwatches.push(0);
 
@@ -775,7 +783,6 @@ function saveAndDownload() {
     	thumbnail.set(i, j, color(rgb));
   	}
 	}
-
 	thumbnail.updatePixels();
 
   colormap = [];
@@ -791,6 +798,26 @@ function saveAndDownload() {
   colormap.push('<NaN r="0.25" g="0" b="0"/>');
   colormap.push('</ColorMap>');
   colormap.push('</ColorMaps>');
+
+  /*  start of work on state saving...
+  
+  console.log(JSON.stringify(srcImageRects));
+  appstate = [];
+  appstate.push("<ColorLoomState>")
+  appstate.push('<Sources>');
+
+  for (i=0; i<srcImageRects.length; i++) {
+    appstate.push('<Image >')
+    image(srcImages[i], srcImageRects[i].x, srcImageRects[i].y, srcImageRects[i].w, srcImageRects[i].h);
+  }
+
+  appstate.push('</Sources>');
+
+  // no need to save the right hand side because that's captured by
+  // the colormap xml that is already saved.
+
+  appstate.push("</ColorLoomState>")
+  */
 
   document.getElementById('UploadDialog').open = true;
 }
