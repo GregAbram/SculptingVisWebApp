@@ -1,6 +1,8 @@
 /** TODO:
 - save/load entire workspace
 */
+const SWATCH_WIDTH = 50;
+const SWATCH_HEIGHT = 80;
 var cmap;
 var thumbnail;
 
@@ -518,7 +520,7 @@ function mousePressed() {
     // Create a new swatch
     var x = srcNextSwatchX[inSrcImage];
     var y = srcNextSwatchY[inSrcImage];
-    srcSwatches.push(new Swatch(new Rect(x,y,50,80), inSrcColor));
+    srcSwatches.push(new Swatch(new Rect(x,y,SWATCH_WIDTH,SWATCH_HEIGHT), inSrcColor));
     srcNumSwatches[inSrcImage]++;
 		// Update position for next swatch
     srcNextSwatchX[inSrcImage] += border + 50;
@@ -611,7 +613,7 @@ function mouseReleased() {
     var mx = mouseX - cmapPanelRect.x + xDragOffset;
     var my = mouseY - cmapPanelRect.y + yDragOffset;
 		var c = srcSwatches[srcHighlighted].col;
-    cmapSwatches.push(new Swatch(new Rect(mx,my,50,80), c));
+    cmapSwatches.push(new Swatch(new Rect(mx,my,SWATCH_WIDTH,SWATCH_HEIGHT), c));
     cmap = buildColorMapFromSwatches(cmapSwatches, border, cmapPanelRect.h-border);
 
   	// move the src swatch back to its original location
@@ -688,7 +690,7 @@ function gotFile(p5file) {
         // Create a new swatch
     	var x = srcNextSwatchX[srcImageRects.length-1];
     	var y = srcNextSwatchY[srcImageRects.length-1];
-    	srcSwatches.push(new Swatch(new Rect(x,y,50,80), col));
+    	srcSwatches.push(new Swatch(new Rect(x,y,SWATCH_WIDTH,SWATCH_HEIGHT), col));
     	srcNumSwatches[srcImageRects.length-1]++;
         // Update position for next swatch
     	srcNextSwatchX[srcImageRects.length-1] += border + 50;
@@ -710,8 +712,8 @@ function gotFile(p5file) {
           let b = points[p].getNum('b');
           let col = color(r*255.0, g*255.0, b*255.0);
           var mx = border;
-          var my = border + val*(cmapPanelRect.h - 2*border);
-          cmapSwatches.push(new Swatch(new Rect(mx,my,50,80), col));
+          var my = border + val*(cmapPanelRect.h - 2*border) - SWATCH_HEIGHT / 2;
+          cmapSwatches.push(new Swatch(new Rect(mx,my,SWATCH_WIDTH,SWATCH_HEIGHT), col));
         }
         cmap = buildColorMapFromSwatches(cmapSwatches, border, cmapPanelRect.h-border);
       }
@@ -756,7 +758,7 @@ function newInputLoaded() {
       // Create a new swatch
     	var x = srcNextSwatchX[srcImageRects.length-1];
     	var y = srcNextSwatchY[srcImageRects.length-1];
-    	srcSwatches.push(new Swatch(new Rect(x,y,50,80), color(palette[p])));
+    	srcSwatches.push(new Swatch(new Rect(x,y,SWATCH_WIDTH,SWATCH_HEIGHT), color(palette[p])));
     	srcNumSwatches[srcImageRects.length-1]++;
 			// Update position for next swatch
     	srcNextSwatchX[srcImageRects.length-1] += border + 50;
