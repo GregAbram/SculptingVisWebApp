@@ -121,6 +121,13 @@
   {
     event.dataTransfer.setData("uuid", uuid);
     event.dataTransfer.setData("host", location.host);
+
+    let dataForIframe = {
+      'uuid': uuid,
+      'host': location.host,
+    };
+
+    window.parent.postMessage(JSON.stringify(dataForIframe), 'http://localhost:8000');
   }
 
   var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
