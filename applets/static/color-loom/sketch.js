@@ -330,9 +330,9 @@ function draw() {
   textSize(15);
   text('Source Image Workspace', srcPanelRect.x + srcPanelRect.w/2, 20);
   textSize(10);
-  text('Drag up to 4 images onto the workspace.  Click and drag to sample colors from them.', srcPanelRect.x + srcPanelRect.w/2, 40);
-  text('When you have a color you like, drag its swatch to the ColorMap Panel.', srcPanelRect.x + srcPanelRect.w/2, 55);
-  text('Delete a swatch by pressing BACKSPACE or DELETE when your mouse is over it.', srcPanelRect.x + srcPanelRect.w/2, 70);
+  text('Drag up to 4 images from your computer onto the workspace below.  Click anywhere on an image to sample a new color.', srcPanelRect.x + srcPanelRect.w/2, 40);
+  text('When you have a color you like, drag its swatch to the ColorMap Panel on the right.', srcPanelRect.x + srcPanelRect.w/2, 55);
+  text('Delete a swatch by pressing DELETE when your mouse is over it.', srcPanelRect.x + srcPanelRect.w/2, 70);
 
   textSize(15);
   text('ColorMap Workspace', cmapPanelRect.x + cmapPanelRect.w/2, 20);
