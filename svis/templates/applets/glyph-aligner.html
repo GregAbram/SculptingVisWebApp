@@ -1,19 +1,29 @@
 {% load static %}
 {% csrf_token %}
 
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="en">
+  <head>
 		<title>Glyph Aligner</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <base href="/">
-	<link rel="stylesheet" type="text/css" href="{% static 'glyph-aligner/style.css' %}"> 
+	      <link rel="stylesheet" type="text/css" href="{% static 'glyph-aligner/style.css' %}"> 
         <link rel="stylesheet" type="text/css" href="{% static 'spinner.css' %}">
 	</head>
 	<body ondrop="drop(event)" ondragover="allowDrop(event)">
 		<canvas id="c"></canvas>
 
 	<div id="content">
-			<div id="info">ABR Glyph Aligner</div>
+      <h1 id="info">ABR Glyph Aligner</h1>
+      <div>
+        <p>Instructions</p>
+        <ol>
+          <li>Drag an .obj file into the Glyph Align Window</li>
+          <li>Left-click + Drag the Glyph Align Window to rotate its view</li>
+          <li>Right-click + Drag the Glyph Align Window to rotate its coordinate system</li>
+        </ol>
+      </div>
+
 <table>
   <tr>
     <td>
@@ -21,7 +31,7 @@
       <div id="up">Up Vec = (<input type="text" id="up_vec_x" name="up_vec_x" size="10" onchange="updateVec('ux')" readonly="">, <input type="text" id="up_vec_y" name="up_vec_y" size="10" onchange="updateVec('uy')" readonly="">, <input type="text" id="up_vec_z" name="up_vec_z" size="10" onchange="updateVec('uz')" readonly="">)
       <br>
       <button type="button" onmousedown="rotateAxisPos(); intervalId=setInterval(rotateAxisPos, 30);" onmouseup="clearInterval(intervalId)">Rotate +</button>
-      <button type="button" onmousedown="rotateAxisNeg(); intervalId=setInterval(rotateAxisNeg, 30);" onmouseup="clearInterval(intervalId)">Rotate -</button>
+      <button type="button" onmousedown="rotateAxisNeg(); intervalId=setInterval(rotateAxisNeg, 50);" onmouseup="clearInterval(intervalId)">Rotate -</button>
       <br>
       <input type="checkbox" id="renderData" name="renderData" checked="true"><label for="renderData">Render Data Preview</label>
     </td>
