@@ -221,16 +221,17 @@ function synthesizeTexture() {
 function setup() {
   // create canvas
   canvas = createCanvas(1400, 700);
+
   // Add an event for when a file is dropped onto the canvas
   canvas.drop(gotFile);
 
   // Setup sliders for various parameters of the algorithm
   justRepeatCheckbox = createCheckbox('', true);
-  justRepeatCheckbox.position(20, 40);
+  justRepeatCheckbox.position(canvas.position().x + 20, canvas.position().y + 30);
   justRepeatCheckbox.changed(updateTextParam);
 
   jumpProbabilitySlider = createSlider(0, 100, 10);
-  jumpProbabilitySlider.position(20, 100);
+  jumpProbabilitySlider.position(canvas.position().x + 20, canvas.position().y + 100);
   jumpProbabilitySlider.input(updateSliderParam);
   jumpProbabilityInput = createInput(jumpProbabilitySlider.value());
   jumpProbabilityInput.position(jumpProbabilitySlider.x + jumpProbabilitySlider.width + 10, jumpProbabilitySlider.y);
@@ -238,7 +239,7 @@ function setup() {
   jumpProbabilityInput.input(updateTextParam);
 
   goodJumpThreshSlider = createSlider(0, 100, 95);
-  goodJumpThreshSlider.position(20, 160);
+  goodJumpThreshSlider.position(canvas.position().x + 20, canvas.position().y + 160);
   goodJumpThreshSlider.input(updateSliderParam);
   goodJumpThreshInput = createInput(goodJumpThreshSlider.value());
   goodJumpThreshInput.position(goodJumpThreshSlider.x + goodJumpThreshSlider.width + 10, goodJumpThreshSlider.y);
@@ -246,7 +247,7 @@ function setup() {
   goodJumpThreshInput.input(updateTextParam);
 
   minJumpSizeSlider = createSlider(0, 100, 20);
-  minJumpSizeSlider.position(20, 220);
+  minJumpSizeSlider.position(canvas.position().x + 20, canvas.position().y + 220);
   minJumpSizeSlider.input(updateSliderParam);
   minJumpSizeInput = createInput(minJumpSizeSlider.value());
   minJumpSizeInput.position(minJumpSizeSlider.x + minJumpSizeSlider.width + 10, minJumpSizeSlider.y);
@@ -254,20 +255,20 @@ function setup() {
   minJumpSizeInput.input(updateTextParam);
 
   texHeightInput = createInput(2048);
-  texHeightInput.position(20, 280);
+  texHeightInput.position(canvas.position().x + 20, canvas.position().y + 280);
   texHeightInput.style('width', '60px');
   texHeightInput.input(updateTextParam);
 
   familyInput = createInput();
-  familyInput.position(90, 380);
+  familyInput.position(canvas.position().x + 80, canvas.position().y + 380);
   familyInput.style('width', '120px');
 
   classInput = createInput();
-  classInput.position(90, 410);
+  classInput.position(canvas.position().x + 80, canvas.position().y + 410);
   classInput.style('width', '120px');
 
   let saveButton = createButton('Save to Library');
-  saveButton.position(20, 440);
+  saveButton.position(canvas.position().x + 20, canvas.position().y + 440);
   saveButton.mousePressed(saveToLibrary);
 }
 
@@ -282,10 +283,27 @@ function draw() {
   noStroke();
   textSize(15);
   textAlign(LEFT);
-  text('Nothing fancy -- just repeat it.', justRepeatCheckbox.x, 32);
+  text('Nothing fancy -- just repeat it.', justRepeatCheckbox.x + 22, justRepeatCheckbox.y - 40);
 
   if (justRepeatCheckbox.checked()) {
     fill(150);
+    jumpProbabilitySlider.style('opacity', '0.2');
+    goodJumpThreshSlider.style('opacity', '0.2');
+    minJumpSizeSlider.style('opacity', '0.2');
+    jumpProbabilityInput.style('opacity', '0.2');
+    goodJumpThreshInput.style('opacity', '0.2');
+    minJumpSizeInput.style('opacity', '0.2');
+    texHeightInput.style('opacity', '0.2');
+  }
+  else {
+    fill(255);
+    jumpProbabilitySlider.style('opacity', '1');
+    goodJumpThreshSlider.style('opacity', '1');
+    minJumpSizeSlider.style('opacity', '1');
+    jumpProbabilityInput.style('opacity', '1');
+    goodJumpThreshInput.style('opacity', '1');
+    minJumpSizeInput.style('opacity', '1');
+    texHeightInput.style('opacity', '1');
   }
   text('How often to jump around?', jumpProbabilitySlider.x, 92);
   text('How well do jumps have to match?', goodJumpThreshSlider.x, 152);
@@ -293,8 +311,8 @@ function draw() {
   text('Height of output texture?', texHeightInput.x, 272);
 
   fill(255);
-  text("Family?", 20, familyInput.y+12);
-  text("Class?", 20, classInput.y+12);
+  text("Family", 20, familyInput.y - 33);
+  text("Class", 20, classInput.y - 33);
 
 
   stroke(255);
