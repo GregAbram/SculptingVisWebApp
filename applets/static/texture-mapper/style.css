@@ -7,10 +7,15 @@ img {
   font-size: 30pt;
 }
 
+.w3-bar {
+  position: fixed;
+  z-index: 100;
+}
+
 #drag-n-drop {
   position: fixed;
   left: 0;
-  top: 0;
+  top: 51;
   width: 75vw;
   height: 100vh;
   overflow: hidden;
@@ -20,7 +25,7 @@ img {
 }
 
 #drag-n-drop * {
-  top: 50vh;
+  margin-top: 45vh;
   font-size: 30px;
 }
 
@@ -28,7 +33,7 @@ img {
   border: 1px solid black;
   position: absolute;
   left: 0;
-  top: 0;
+  top: 51;
   width: 70vh;
   height: 70vh;
 }
@@ -38,12 +43,13 @@ img {
   z-index: -1;
   height: 100vh;
   width: auto;
+  margin-top: 51;
 }
 
 .ui {
   position: fixed;
   right: 0;
-  top: 0;
+  top: 51;
   width: 15vw;
   height: 100vh;
   background: #eee;
@@ -111,8 +117,9 @@ img {
 
 .texture-chooser {
   position: fixed;
-  right: calc(15vw + 40px);
-  top: 0;
+  /* right: calc(15vw + 40px); */
+  right: 15vw;
+  top: 51;
   width: 10vw;
   height: 100vh;
   background: #ccc;
