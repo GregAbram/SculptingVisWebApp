@@ -5,17 +5,26 @@
 <html>
   <head>
     <title>Infinite Line</title>
+    <meta charset="utf-8">
+    <base href="/">
     <!-- <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>  -->
     <script src="{% static 'jquery-3.4.1.min.js' %}"></script>
     <script src="{% static 'p5.min.js' %}"></script>
     <script src="{% static 'p5.dom.min.js' %}"></script> 
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" type="text/css" href="{% static 'infinite-line/style.css' %}"> 
-    <meta charset="utf-8">
   </head>
   <body>
-   <script>
-     var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-   </script>
-   <script src="{% static 'infinite-line/sketch.js' %}"></script> 
+    <div class="w3-bar w3-dark-grey w3-card w3-left-align w3-large">
+      <a id="color-loom-selector-2" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="applets/load_applet/color-loom">color loom</a>
+      <a id="glyph-aligner-selector" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="applets/load_applet/glyph-aligner">glyph aligner</a>
+      <a id="infinite-line-selector" class="w3-bar-item w3-button w3-padding-large w3-white w3-hover-white" href="applets/load_applet/infinite-line">infinite line</a>
+      <a id="texture-mapper-selector" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="applets/load_applet/texture-mapper">texture mapper</a>
+    </div>
+
+    <script>
+      var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    </script>
+    <script src="{% static 'infinite-line/sketch.js' %}"></script> 
   </body>
 </html>

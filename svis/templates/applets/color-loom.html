@@ -3,12 +3,13 @@
 
 <!DOCTYPE html>
 <html>
-  <title>Color Looper</title>
+  <title>Color Loom</title>
   <head>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.js"></script>
 
     <base href="/">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" type="text/css" href="{% static 'color-loom/style.css' %}">
 
     <script>
@@ -18,6 +19,14 @@
     <meta charset="utf-8">
   </head>
   <body>
+
+    <div class="w3-bar w3-dark-grey w3-card w3-left-align w3-large">
+      <a id="color-loom-selector-2" class="w3-bar-item w3-button w3-padding-large w3-white w3-hover-white" href="applets/load_applet/color-loom">color loom</a>
+      <a id="glyph-aligner-selector" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="applets/load_applet/glyph-aligner">glyph aligner</a>
+      <a id="infinite-line-selector" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="applets/load_applet/infinite-line">infinite line</a>
+      <a id="texture-mapper-selector" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="applets/load_applet/texture-mapper">texture mapper</a>
+      <!-- <a id="scale-builder-selector" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="load_applet/scale-builder">scale builder</a> -->
+    </div>
 
   <dialog id=UploadDialog style="z-index: 1">
     <table>

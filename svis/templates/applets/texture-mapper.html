@@ -6,8 +6,11 @@
   <head>
     <link rel="stylesheet" type="text/css" href="{% static 'texture-mapper/style.css' %}">
     <meta charset="utf-8">
-    <title>Texture Looper</title>
+    <title>Texture Mapper</title>
 
+    <base href="/">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.2.0/jszip.min.js"> </script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="{% static 'texture-mapper/jquery-ui-1.12.1.custom/external/jquery/jquery.js' %}"></script>
@@ -20,10 +23,17 @@
   </head>
 
   <body>
+    <div class="w3-bar w3-dark-grey w3-card w3-left-align w3-large">
+      <a id="color-loom-selector-2" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="applets/load_applet/color-loom">color loom</a>
+      <a id="glyph-aligner-selector" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="applets/load_applet/glyph-aligner">glyph aligner</a>
+      <a id="infinite-line-selector" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="applets/load_applet/infinite-line">infinite line</a>
+      <a id="texture-mapper-selector" class="w3-bar-item w3-button w3-padding-large w3-white w3-hover-white" href="applets/load_applet/texture-mapper">texture mapper</a>
+    </div>
+
     <img id="image-to-crop" src="#" alt="Waiting for you to upload a texture...">
     <div id="crop-area"></div>
     <div id="drag-n-drop">
-      <p>Drag and drop image...</p>
+      <p>Drag and drop an image here...</p>
     </div>
 
     <div class="texture-chooser">
