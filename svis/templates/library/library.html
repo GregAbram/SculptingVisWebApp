@@ -74,6 +74,14 @@
     });
   }
 
+  var downloadArtifact = function(ev)
+  {
+    a = document.createElement("a");
+    a.href = '/library/downloadartifact/' + ev.dataTransfer.getData("uuid");
+    a.setAttribute("download", "Will not be used");
+    a.click();
+  }
+
   var selectedArtifact = function(ev, uuid)
   {
   }
@@ -203,6 +211,13 @@ html, body {
   width: 100%;
 }
 
+.download {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  left: 0;
+}
+
 .trash {
   position: absolute;
   z-index: 1;
@@ -248,8 +263,12 @@ html, body {
 
 <div name='grid' style="height: 100%; overflow: auto;" ondrop="dropArtifact(event)" ondragover="allowDropArtifact(event)"></div>
 
+<div class=download ondrop="downloadArtifact(event)" ondragover="allowDropArtifact(event)">
+  <img src="{% static "download.png" %}" alt="trash" height="75" width="75">
+</div>
+
 <div class=trash ondrop="hideArtifact(event)" ondragover="allowDropArtifact(event)">
-  <img src="{% static "trash.png" %}" alt="trash" height="75" width="75">
+  <img src="{% static "trash.png" %}" alt="download" height="75" width="75">
 </div>
 
 </body>

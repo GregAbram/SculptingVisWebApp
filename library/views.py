@@ -221,3 +221,22 @@ def downloadselection(request, uuids):
   file = open(fname, 'rb')
   request.session['selections'] = []
   return FileResponse(file, as_attachment=True, filename='SculptingVis.tgz')
+
+def downloadartifact(request, uuid):
+  with open(settings.ARTIFACTS + '/' + uuid + '/artifact.json') as f:
+    desc = json.load(f)
+  typ = desc['type']
+  if typ == 'glyph':
+    file = desc['artifactData'][0]['mesh']
+  elif typ == 'colormap':
+    file = desc['artifactData']['colormap']
+  elif typ == 'line':
+    file = desc['artifactData']['horizontal']
+  elif typ == 'texture':
+    file = desc['artifactData']['image']
+  ext = file.rsplit('.')[1]
+  artifact_name = typ + '_' + desc['class'] + '_' + desc['family'] + '.' + ext
+  fullname = settings.ARTIFACTS + '/' + uuid + '/' + file
+  file = open(fullname, 'rb')
+  request.session['selections'] = []
+  return FileResponse(file, as_attachment=True, filename=artifact_name)
