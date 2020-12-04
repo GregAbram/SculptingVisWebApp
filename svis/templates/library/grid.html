@@ -13,15 +13,15 @@
     {% if forloop.first %}
       {% for col in row %}
         {% if forloop.first %}
-          <th><div onclick="ShowArtifacts();">All</div></th>
+          <th><div onclick="ShowArtifacts();" style="cursor: pointer;">All</div></th>
         {% else %}
-          <th><div onclick="ShowClass('{{col}}');">{{col}}</div></th>
+          <th><div onclick="ShowClass('{{col}}');" style="cursor: pointer;">{{col}}</div></th>
         {% endif %}
       {% endfor %}
     {% else %}
       {% for col in row %}
         {% if forloop.first %}
-          <th><div onclick="ShowFamily('{{col}}');">{{col}}</div></th>
+          <th><div onclick="ShowFamily('{{col}}');" style="cursor: pointer;">{{col}}</div></th>
         {% else %}
           <td>
             <div class=thumbnail style="width: {{width}}px; height: {{height}}px; overflow-x: scroll; overflow-y: hidden">

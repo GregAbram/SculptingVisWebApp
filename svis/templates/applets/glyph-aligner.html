@@ -1,88 +1,135 @@
 {% load static %}
 {% csrf_token %}
 
-<!DOCTYPE html><html lang="en"><head>
-		<title>Glyph Aligner</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        <base href="/">
-	<link rel="stylesheet" type="text/css" href="{% static 'glyph-aligner/style.css' %}"> 
-        <link rel="stylesheet" type="text/css" href="{% static 'spinner.css' %}">
-	</head>
-	<body ondrop="drop(event)" ondragover="allowDrop(event)">
-		<canvas id="c"></canvas>
+<!DOCTYPE html>
+<html lang="en">
 
-	<div id="content">
-			<div id="info">ABR Glyph Aligner</div>
-<table>
-  <tr>
-    <td>
-      <div id="forward">Forward Vec = (<input type="text" id="forward_vec_x" name="forward_vec_x" size="10" onchange="updateVec('fx')" readonly="">, <input type="text" id="forward_vec_y" name="forward_vec_y" size="10" onchange="updateVec('fy')" readonly="">, <input type="text" id="forward_vec_z" name="forward_vec_z" size="10" onchange="updateVec('fz')" readonly="">)</div>
-      <div id="up">Up Vec = (<input type="text" id="up_vec_x" name="up_vec_x" size="10" onchange="updateVec('ux')" readonly="">, <input type="text" id="up_vec_y" name="up_vec_y" size="10" onchange="updateVec('uy')" readonly="">, <input type="text" id="up_vec_z" name="up_vec_z" size="10" onchange="updateVec('uz')" readonly="">)
-      <br>
-      <button type="button" onmousedown="rotateAxisPos(); intervalId=setInterval(rotateAxisPos, 30);" onmouseup="clearInterval(intervalId)">Rotate +</button>
-      <button type="button" onmousedown="rotateAxisNeg(); intervalId=setInterval(rotateAxisNeg, 30);" onmouseup="clearInterval(intervalId)">Rotate -</button>
-      <br>
-      <input type="checkbox" id="renderData" name="renderData" checked="true"><label for="renderData">Render Data Preview</label>
-    </td>
-    <td width=50></td>
-    <td>
+<head>
+  <title>Glyph Aligner</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <base href="/">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" type="text/css" href="{% static 'glyph-aligner/style.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'spinner.css' %}">
+</head>
+
+
+<body ondrop="drop(event)" ondragover="allowDrop(event)">
+  <canvas id="c"></canvas>
+
+  <div id="content-container">
+    <div class="w3-bar w3-dark-grey w3-card w3-left-align w3-large">
+      <a id="color-loom-selector-2" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="applets/load_applet/color-loom">color loom</a>
+      <a id="glyph-aligner-selector" class="w3-bar-item w3-button w3-padding-large w3-white w3-hover-white" href="applets/load_applet/glyph-aligner">glyph aligner</a>
+      <a id="infinite-line-selector" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="applets/load_applet/infinite-line">infinite line</a>
+      <a id="texture-mapper-selector" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="applets/load_applet/texture-mapper">texture mapper</a>
+      <!-- <a id="scale-builder-selector" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="load_applet/scale-builder">scale builder</a> -->
+    </div>
+
+    <div id="content">
+      <!-- <h1 id="info">ABR Glyph Aligner</h1> -->
+      <div id="instructions">
+        <h3>Instructions</h3>
+        <ol>
+          <li>Drag an <strong>.obj</strong> file from your computer into the Glyph Align Window.</li>
+          <li>To align the glyph, you can do one or both of the following:
+            <ul>
+              <li>Right Click + Drag the Glyph Align Window to rotate its coordinate system.</li>
+              <li>Click on the <strong>Rotate +</strong> and <strong>Rotate -</strong> buttons.</li>
+            </ul>
+          </li>
+          <li>Left Click + Drag the Glyph Align Window to rotate its view.</li>
+          <li>Left Click + Drag the Data-Driven Preview to see how the glyph will look on an example data visualization.
+          </li>
+          <li>Click <strong>Render Thumbnail</strong> to create a thumbnail image of the glyph. This image is rendered according to the
+            view of the Glyph Align Window.</li>
+          <li>When you're ready, give a Family and Class name for this glyph, then click <strong>Export Obj</strong>.</li>
+        </ol>
+      </div>
+
       <table>
         <tr>
-          <td align="center">
-            <canvas id='thumbnail_canvas' width=100 height=100 style="outline:2px solid black;" />
+          <td>
+            <div id="forward">Forward Vec = (<input type="text" id="forward_vec_x" name="forward_vec_x" size="10"
+                onchange="updateVec('fx')" readonly="">, <input type="text" id="forward_vec_y" name="forward_vec_y"
+                size="10" onchange="updateVec('fy')" readonly="">, <input type="text" id="forward_vec_z"
+                name="forward_vec_z" size="10" onchange="updateVec('fz')" readonly="">)</div>
+            <div id="up">Up Vec = (<input type="text" id="up_vec_x" name="up_vec_x" size="10" onchange="updateVec('ux')"
+                readonly="">, <input type="text" id="up_vec_y" name="up_vec_y" size="10" onchange="updateVec('uy')"
+                readonly="">, <input type="text" id="up_vec_z" name="up_vec_z" size="10" onchange="updateVec('uz')"
+                readonly="">)
+              <br>
+              <button type="button" onmousedown="rotateAxisPos(); intervalId=setInterval(rotateAxisPos, 30);"
+                onmouseup="clearInterval(intervalId)">Rotate +</button>
+              <button type="button" onmousedown="rotateAxisNeg(); intervalId=setInterval(rotateAxisNeg, 30);"
+                onmouseup="clearInterval(intervalId)">Rotate -</button>
+              <br>
+              <input type="checkbox" id="renderData" name="renderData" checked="true"><label for="renderData">Render Data
+                Preview</label>
           </td>
-        </tr>
-        <tr>
-          <td align="center">
-            <button type="button" onclick="RenderThumbnail()">Render Thumbnail</button></td>
+          <td width=50></td>
+          <td>
+            <table>
+              <tr>
+                <td align="center">
+                  <canvas id='thumbnail_canvas' width=100 height=100 style="outline:2px solid black;" />
+                </td>
+              </tr>
+              <tr>
+                <td align="center">
+                  <button type="button" onclick="RenderThumbnail()">Render Thumbnail</button></td>
           </td>
         </tr>
       </table>
-    </td>
-    <td width=50></td>
-    <td>
-      <table>
-        <tr>
-          <td align="center">Family</td><td><input id="family" type="text" width=200 background-color=red;></td>
-        </tr>
-        <tr>
-          <td align="center">Class</td><td><input id="clss" type="text" width=200></td>
-        </tr>
-        <tr>
-          <td colspan="2" align="center"><button type="button" onclick="exportToObj()">Export Obj</button></td>
-        </tr>
+
+      <td width=50></td>
+
+      <td>
+        <table>
+          <tr>
+            <td align="center">Family</td>
+            <td><input id="family" type="text" width=200 background-color=red;></td>
+          </tr>
+          <tr>
+            <td align="center">Class</td>
+            <td><input id="clss" type="text" width=200></td>
+          </tr>
+          <tr>
+            <td colspan="2" align="center"><button type="button" onclick="exportToObj()">Export Obj</button></td>
+          </tr>
         </table>
-    </td>
-	</tr>
-</table>
-</div>
+      </td>
 
+      </table>
     </div>
-    
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  </div>
 
-    <script src="{% static 'glyph-aligner/three.min.js' %}"></script>
-    <script src="{% static 'glyph-aligner/OrbitControls.js' %}"></script>
-    <script src="{% static 'glyph-aligner/TrackballControls.js' %}"></script>
-    <script src="{% static 'glyph-aligner/WebGL.js' %}"></script>
-    <script src="{% static 'glyph-aligner/OBJExporter.js' %}"></script>
-    <script src="{% static 'glyph-aligner/PLYExporter.js' %}"></script>
-    <script src="{% static 'glyph-aligner/BufferGeometryUtils.js' %}"></script>
-    <script src="{% static 'glyph-aligner/mesh_simplify.js' %}"></script>
-    <script src="{% static 'glyph-aligner/OBJLoader.js' %}"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
-    <script>
-      var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-    </script>
+  <script src="{% static 'glyph-aligner/three.min.js' %}"></script>
+  <script src="{% static 'glyph-aligner/OrbitControls.js' %}"></script>
+  <script src="{% static 'glyph-aligner/TrackballControls.js' %}"></script>
+  <script src="{% static 'glyph-aligner/WebGL.js' %}"></script>
+  <script src="{% static 'glyph-aligner/OBJExporter.js' %}"></script>
+  <script src="{% static 'glyph-aligner/PLYExporter.js' %}"></script>
+  <script src="{% static 'glyph-aligner/BufferGeometryUtils.js' %}"></script>
+  <script src="{% static 'glyph-aligner/mesh_simplify.js' %}"></script>
+  <script src="{% static 'glyph-aligner/OBJLoader.js' %}"></script>
 
-      
-		<script id="template" type="notjs">
-			<div class="scene"></div>
-			<div class="description">$</div>
-		</script>
-    
-		<script src="{% static 'glyph-aligner/sketch.js' %}"></script>
+  <script>
+    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+  </script>
 
-<div id="spinner"></div>
-</body></html>
+
+  <script id="template" type="notjs">
+    <div class="scene"></div>
+    <div class="description">$</div>
+  </script>
+
+  <script src="{% static 'glyph-aligner/sketch.js' %}"></script>
+
+  <div id="spinner"></div>
+</body>
+
+</html>

@@ -6,29 +6,33 @@
 
 body {
   color: #000;
-  font-family:Monospace;
+  font-family: sans-serif;
   font-size:13px;
 
   background-color: #fff;
   margin: 0;
 }
 
+body,h1,h2,h3,h4,h5,h6 {
+  font-family: "Lato", sans-serif
+}
+.w3-bar,h1,button {
+  font-family: "Montserrat", sans-serif
+}
+
 input {
   background-color: lightgrey;
 }
 
-#info {
+#content-container {
   position: absolute;
-  top: 0; width: 100%;
-  padding: 5px;
-  text-align:center;
+  top: 0; 
+  width: 100%;
+  z-index: 1;
 }
 
 #content {
-  position: absolute;
-  top: 0; width: 100%;
-  z-index: 1;
-  padding: 3em 0 0 0;
+  padding: 10px 30px;
 }
 
 a {
