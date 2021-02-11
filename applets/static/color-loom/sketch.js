@@ -202,7 +202,7 @@ function setup() {
   canvas = createCanvas(1100, 800);
   canvas.drop(gotFile);
 
-  border = 15;
+  border = 20;
 
   cpPanelRect = new Rect(border, 7*border, 100-2*border, height-8*border);
 
@@ -238,7 +238,10 @@ function setup() {
   saveButton.size(200, 25);
   saveButton.mousePressed(saveAndDownload);
 
-
+  let webcamButton = createButton('Take An Image With Your Webcam');
+  webcamButton.position(srcPanelRect.x + srcPanelRect.w/2 - 150, srcPanelRect.y + 15);
+  webcamButton.size(300, 25);
+  webcamButton.mousePressed(saveAndDownload);
 
 
   /**
@@ -727,6 +730,7 @@ function gotFile(p5file) {
 
 
 function newInputLoaded() {
+  console.log(droppedImg);
   srcImages.push(droppedImg);
   srcImages[srcImages.length-1].loadPixels();
   var maxh = 0.2*srcPanelRect.h;
@@ -804,8 +808,8 @@ function saveAndDownload() {
   colormap.push('</ColorMaps>');
 
 
-  document.getElementById('colorLooperFamily').value = "(required)";
-  document.getElementById('colorLooperClass').value = "(required)";
+  document.getElementById('colorLooperFamily').placeholder = "(required)";
+  document.getElementById('colorLooperClass').placeholder = "(required)";
   document.getElementById('UploadDialog').open = true;
 }
 
@@ -814,7 +818,7 @@ function upload(event)
   f = document.getElementById('colorLooperFamily').value;
   c = document.getElementById('colorLooperClass').value;
 
-  if (f == '(required)' || c == '(required)')
+  if (f == '' || c == '')
   {
     alert('please enter family and class');
     return;
