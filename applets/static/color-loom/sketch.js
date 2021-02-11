@@ -199,7 +199,7 @@ var srcAndCmapPanelRect;
 
 
 function setup() {
-  canvas = createCanvas(1100, 800);
+  canvas = createCanvas(1100, 870);
   canvas.drop(gotFile);
 
   border = 20;
@@ -238,7 +238,7 @@ function setup() {
   saveButton.size(200, 25);
   saveButton.mousePressed(saveAndDownload);
 
-  let webcamButton = createButton('Take An Image With Your Webcam');
+  let webcamButton = createButton('Take A Photo With Your Webcam');
   webcamButton.position(srcPanelRect.x + srcPanelRect.w/2 - 150, srcPanelRect.y + 15);
   webcamButton.size(300, 25);
   webcamButton.mousePressed(saveAndDownload);

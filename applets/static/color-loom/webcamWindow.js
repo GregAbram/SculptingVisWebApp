@@ -34,22 +34,11 @@ let myp5 = new p5(( sketch ) => {
         snapButton.mousePressed(sketch.takeASnap);
     };
 
-    sketch.takeASnap = () => {
-        // droppedImg = webcamVideo.get();
-
-        // console.log("webcamVideo");
-        // console.log(webcamVideo);
-        // console.log("webcamVideo.get()");
-        // console.log(webcamVideo.get());
-        
+    sketch.takeASnap = () => {        
         sketch.image(webcamVideo, webcamImageX, webcamImageY, videoW, videoH);
         droppedImg = sketch.get(webcamImageX, webcamImageY, videoW, videoH);
         newInputLoaded();
     }
-
-    // sketch.draw = () => {
-    //     sketch.image(webcamVideo, webcamImageX, webcamImageY, videoW, videoH);
-    // };
 });
 
 
