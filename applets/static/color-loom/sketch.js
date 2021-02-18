@@ -241,8 +241,9 @@ function setup() {
   let webcamButton = createButton('Take A Photo With Your Webcam');
   webcamButton.position(srcPanelRect.x + srcPanelRect.w/2 - 150, srcPanelRect.y + 15);
   webcamButton.size(300, 25);
-  webcamButton.mousePressed(saveAndDownload);
-
+  webcamButton.mousePressed(() => {
+    webcamWindowDiv.style.display = "block";
+  });
 
   /**
   // pre-calc cPicker images

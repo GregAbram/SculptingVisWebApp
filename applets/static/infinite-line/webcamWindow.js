@@ -11,6 +11,11 @@ let myp5 = new p5(( sketch ) => {
     let webcamImageX = videoMargin;
     let webcamImageY = videoMargin + 30;
 
+    let inputImgW = 110;
+    let inputImgH = videoH;
+    let inputImgX = webcamImageX + videoW/2 - inputImgW/2;
+    let inputImgY = webcamImageY;
+
     sketch.setup = () => {
         // Attach the canvas to the draggable div
         let myCanvas = sketch.createCanvas(videoW + videoMargin*2, videoH + videoMargin*2 + 60);
@@ -20,13 +25,14 @@ let myp5 = new p5(( sketch ) => {
 
         // Get the webcam input
         webcamVideo = sketch.createCapture(VIDEO);
-        webcamVideo.parent("webcamWindow");
-        webcamVideo.size(videoW, videoH);
-        webcamVideo.style(`
-          position: absolute; 
-          top: ${webcamImageY}; 
-          left: ${webcamImageX};
-        `);
+        // webcamVideo.parent("webcamWindow");
+        // webcamVideo.size(videoW, videoH);
+        // webcamVideo.style(`
+        //   position: absolute; 
+        //   top: ${webcamImageY}; 
+        //   left: ${webcamImageX};
+        // `);
+        webcamVideo.hide();
 
         // UI Stuff -----------------------------------------------------
 
@@ -74,9 +80,20 @@ let myp5 = new p5(( sketch ) => {
     sketch.takeASnap = () => {        
         sketch.image(webcamVideo, webcamImageX, webcamImageY, videoW, videoH);
 
-        // droppedImg and newInputLoaded() are variables in Color Loom
-        droppedImg = sketch.get(webcamImageX, webcamImageY, videoW, videoH);
+        // inputImg and newInputLoaded() are variables in Infinite Line
+        inputImg = sketch.get(inputImgX, inputImgY, inputImgW, inputImgH);
         newInputLoaded();
+    }
+
+    let overlayRectW = (videoW - inputImgW)/2;
+    let overlayRectH = videoH;
+
+    sketch.draw = () => {
+      sketch.image(webcamVideo, webcamImageX, webcamImageY, videoW, videoH);
+      sketch.fill("rgba(0, 0, 0, 0.75)");
+      sketch.noStroke();
+      sketch.rect(webcamImageX, webcamImageY, overlayRectW, videoH);
+      sketch.rect(webcamImageX + overlayRectW + inputImgW, webcamImageY, overlayRectW, videoH);
     }
 });
 

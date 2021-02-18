@@ -22,9 +22,12 @@
       <a id="texture-mapper-selector" class="w3-bar-item w3-button w3-padding-large w3-hover-white" href="applets/load_applet/texture-mapper">texture mapper</a>
     </div>
 
+    <div id="webcamWindow" style="position: absolute; z-index: 1; top: 50%; left: 40%;"></div>
+
     <script>
       var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
     </script>
     <script src="{% static 'infinite-line/sketch.js' %}"></script> 
+    <script src="{% static 'infinite-line/webcamWindow.js' %}"></script> 
   </body>
 </html>
