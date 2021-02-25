@@ -5,11 +5,14 @@ let myp5 = new p5(( sketch ) => {
 
     let videoH = 300;
     let videoW = videoH * 1.333;
-    let videoMargin = 10;
+    let videoMargin = 6;
+
+    let closeButtonSize = 27;
+    let webcamTextSize = 16;
 
     let webcamVideo;
     let webcamImageX = videoMargin;
-    let webcamImageY = videoMargin + 30;
+    let webcamImageY = videoMargin*2 + closeButtonSize;
 
     sketch.setup = () => {
         // Attach the canvas to the draggable div
@@ -26,6 +29,9 @@ let myp5 = new p5(( sketch ) => {
           position: absolute; 
           top: ${webcamImageY}; 
           left: ${webcamImageX};
+          transform: rotateY(180deg);
+          -webkit-transform:rotateY(180deg); /* Safari and Chrome */
+          -moz-transform:rotateY(180deg); /* Firefox */
         `);
 
         // UI Stuff -----------------------------------------------------
@@ -40,19 +46,18 @@ let myp5 = new p5(( sketch ) => {
         snapButton.size(videoW, 30);
         snapButton.mousePressed(sketch.takeASnap);
 
-        sketch.textAlign(CENTER);
-        sketch.textSize(16);
+        sketch.textAlign(CENTER, TOP);
+        sketch.textSize(webcamTextSize);
         sketch.fill(255);
-        let webcamText = sketch.text("Webcam", myCanvas.width/2, 26);
+        let webcamText = sketch.text("Webcam", myCanvas.width/2, videoMargin + webcamTextSize/2);
 
-        let closeButtonSize = 20;
-        let closeButton = sketch.createImg("/static/color-loom/closeButton.png");
+        let closeButton = sketch.createImg("/static/infinite-line/closeButton.png");
         closeButton.parent("webcamWindow");
-        closeButton.position(myCanvas.width - videoMargin - closeButtonSize, 10);
+        closeButton.position(myCanvas.width - videoMargin - closeButtonSize, 6);
         closeButton.size(closeButtonSize, closeButtonSize);
         closeButton.style(`
-          border-radius: 50%;
-          padding: 3px;
+          border-radius: 3px;
+          padding: 7px;
           background: none;
         `);
         closeButton.mouseOver(() => {
