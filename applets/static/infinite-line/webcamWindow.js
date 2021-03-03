@@ -1,18 +1,25 @@
-var webcamWindowDiv = document.getElementById("webcamWindow");
-webcamWindowDiv.style.display = "none";
+const webcamWindowDiv = document.getElementById("webcamWindow");
+const webcamWindowDivStyles = {
+  display: 'none',
+  boxShadow: '1px 2px 25px -5px rgba(0,0,0,0.74)',
+  webkitBoxShadow: '1px 2px 25px -5px rgba(0,0,0,0.74)',
+  mozBoxShadow: '1px 2px 25px -5px rgba(0,0,0,0.74)'
+};
+Object.assign(webcamWindowDiv.style, webcamWindowDivStyles);
+
+var webcamVideo;
 
 let myp5 = new p5(( sketch ) => {
 
     let backgroundColor = 'rgb(120, 120, 120)';
 
-    let videoH = 400;
+    let videoH = 320;
     let videoW = videoH * 1.333;
-    let videoMargin = 6;
+    let videoMargin = 10;
 
     let closeButtonSize = 27;
     let webcamTextSize = 16;
 
-    let webcamVideo;
     let webcamImageX = videoMargin;
     let webcamImageY = videoMargin*2 + closeButtonSize;
 
@@ -21,14 +28,19 @@ let myp5 = new p5(( sketch ) => {
     let inputImgX = webcamImageX + videoW/2 - inputImgW/2;
     let inputImgY = webcamImageY;
 
+    let snapButtonX = videoMargin;
+    let snapButtonY = webcamImageY + videoH;
+
     let myCanvas;
     
     var thresholdValue = 0.3; // Value between 0.0 and 1.0 for the filter(THRESHOLD)
-    var thresholdMode = false;
+    var blackAnhWhiteMode = false;
+
+    let blackAndWhiteSlider;
 
     sketch.setup = () => {
         // Attach the canvas to the draggable div
-        myCanvas = sketch.createCanvas(videoW + videoMargin*2, videoH + videoMargin*2 + 60);
+        myCanvas = sketch.createCanvas(videoW + videoMargin*2, videoH + videoMargin*2 + 100);
         myCanvas.parent("webcamWindow");
         myCanvas.style(`
           transform: rotateY(180deg);
@@ -39,16 +51,11 @@ let myp5 = new p5(( sketch ) => {
         sketch.background(backgroundColor);
 
         // Get the webcam input
-        webcamVideo = sketch.createCapture(VIDEO);
-        // webcamVideo.parent("webcamWindow");
-        // webcamVideo.size(videoW, videoH);
-        // webcamVideo.style(`
-        //   position: absolute; 
-        //   top: ${webcamImageY}; 
-        //   left: ${webcamImageX};
-        // `);
+        webcamVideo = sketch.createCapture(VIDEO, (stream) => {
+          stopWebcam(webcamVideo);
+        });
         webcamVideo.hide();
-
+        
         // UI Stuff -----------------------------------------------------
 
         // White outline around the webcam image
@@ -57,16 +64,45 @@ let myp5 = new p5(( sketch ) => {
 
         let snapButton = sketch.createButton("Snap!");
         snapButton.parent("webcamWindow");
-        snapButton.position(webcamImageX, myCanvas.height - videoMargin - 30);
+        snapButton.position(snapButtonX, snapButtonY);
         snapButton.size(videoW, 30);
+        snapButton.style(`
+          cursor: pointer;
+        `);
         snapButton.mousePressed(sketch.takeASnap);
 
-        // sketch.textAlign(CENTER, TOP);
-        // sketch.textSize(webcamTextSize);
-        // sketch.fill(255);
+        let blackAndWhiteCheckbox = sketch.createCheckbox();
+        blackAndWhiteCheckbox.parent("webcamWindow");
+        blackAndWhiteCheckbox.position(snapButton.x, snapButton.y + 45);
+
+        let blackAndWhiteText = sketch.createP("Black and white filter");
+        blackAndWhiteText.parent("webcamWindow");
+        blackAndWhiteText.position(blackAndWhiteCheckbox.x + 20, blackAndWhiteCheckbox.y - 5);
+        blackAndWhiteText.size(myCanvas.width/2, webcamTextSize);
+        blackAndWhiteText.style(`
+          color: white;
+          margin: 0;
+        `);
+
+        blackAndWhiteSlider = sketch.createSlider(0.2, 0.8, 0.3, 0.01);
+        blackAndWhiteSlider.parent("webcamWindow");
+        blackAndWhiteSlider.position(blackAndWhiteCheckbox.x + 200, blackAndWhiteCheckbox.y);
+        blackAndWhiteSlider.size(220, 15);
+        blackAndWhiteSlider.style('opacity', '0.2');
+
+        blackAndWhiteCheckbox.changed(() => {
+          blackAnhWhiteMode = blackAndWhiteCheckbox.checked();
+          if (blackAnhWhiteMode) {
+            blackAndWhiteSlider.style('opacity', '1');
+          }
+          else {
+            blackAndWhiteSlider.style('opacity', '0.15');
+          }
+        });
+
         let webcamText = sketch.createP("Webcam");
         webcamText.parent("webcamWindow");
-        webcamText.position(0, webcamTextSize/2);
+        webcamText.position(0, videoMargin + 3);
         webcamText.size(myCanvas.width, webcamTextSize);
         webcamText.style(`
           color: white;
@@ -76,9 +112,10 @@ let myp5 = new p5(( sketch ) => {
 
         let closeButton = sketch.createImg("/static/infinite-line/closeButton.png");
         closeButton.parent("webcamWindow");
-        closeButton.position(myCanvas.width - videoMargin - closeButtonSize, 6);
+        closeButton.position(myCanvas.width - videoMargin - closeButtonSize, videoMargin);
         closeButton.size(closeButtonSize, closeButtonSize);
         closeButton.style(`
+          z-index: 2;
           border-radius: 3px;
           padding: 7px;
           background: none;
@@ -86,6 +123,7 @@ let myp5 = new p5(( sketch ) => {
         closeButton.mouseOver(() => {
           closeButton.style(`
             background: rgba(255, 255, 255, 0.25);
+            cursor: pointer;
           `);
         });
         closeButton.mouseOut(() => {
@@ -95,6 +133,7 @@ let myp5 = new p5(( sketch ) => {
         });
         closeButton.mousePressed(() => {
           webcamWindowDiv.style.display = "none";
+          stopWebcam(webcamVideo);
         });
     };
 
@@ -102,11 +141,15 @@ let myp5 = new p5(( sketch ) => {
     sketch.takeASnap = () => {        
         sketch.image(webcamVideo, webcamImageX, webcamImageY, videoW, videoH);
 
+        // Apply the black and white filter
         sketch.filter(THRESHOLD, thresholdValue);
 
         // Draw in the background for the webcam text and close button
         sketch.fill(120);
         sketch.rect(0, 0, myCanvas.width, webcamImageY);
+        sketch.rect(0, snapButtonY, myCanvas.width, 100);
+        sketch.rect(0, webcamImageY, videoMargin, videoH);
+        sketch.rect(videoMargin + videoW, webcamImageY, videoMargin, videoH);
 
         // inputImg and newInputLoaded() are variables in Infinite Line
         inputImg = sketch.get(inputImgX, inputImgY, inputImgW, inputImgH);
@@ -118,15 +161,21 @@ let myp5 = new p5(( sketch ) => {
 
     sketch.draw = () => {
       sketch.image(webcamVideo, webcamImageX, webcamImageY, videoW, videoH);
-      if (thresholdMode)
+      
+      thresholdValue = blackAndWhiteSlider.value();
+      if (blackAnhWhiteMode)
       {
         sketch.filter(THRESHOLD, thresholdValue);
 
         // Draw in the background for the webcam text and close button
         sketch.fill(120);
         sketch.rect(0, 0, myCanvas.width, webcamImageY);
+        sketch.rect(0, snapButtonY, myCanvas.width, 100);
+        sketch.rect(0, webcamImageY, videoMargin, videoH);
+        sketch.rect(videoMargin + videoW, webcamImageY, videoMargin, videoH);
       }
 
+      // Draw overlay transparent boxes
       sketch.fill("rgba(0, 0, 0, 0.75)");
       sketch.noStroke();
       sketch.rect(webcamImageX, webcamImageY, overlayRectW, overlayRectH);
@@ -134,7 +183,6 @@ let myp5 = new p5(( sketch ) => {
     };
 
     sketch.keyPressed = () => {
-      console.log(sketch.keyCode);
       switch (sketch.keyCode)
       {
         case RIGHT_ARROW:
@@ -151,24 +199,54 @@ let myp5 = new p5(( sketch ) => {
             thresholdValue = 0;
           }
           break;
-        case 32:
-          thresholdMode = !thresholdMode;
+        case 32: // SPACEBAR
+          blackAnhWhiteMode = !blackAnhWhiteMode;
           break;
       }
       return false;
     }
 });
 
+// Turn off the webcam
+// Adapted from the stop() method in webcam-easy
+// https://github.com/bensonruan/webcam-easy/blob/0ebfea62fec456c9b618d5f17c72386124e753b5/src/webcam-easy.js
+function stopWebcam(element) {
+  element.stop();
+  element.elt.srcObject.getTracks().forEach(track => {
+    track.stop();
+  });
+}
+
+// Reopen the webcam
+// Adapted from the stream() method in webcam-easy
+// https://github.com/bensonruan/webcam-easy/blob/0ebfea62fec456c9b618d5f17c72386124e753b5/src/webcam-easy.js
+async function reopenWebcam(element) {
+  let constraints = { video: true, audio: false };
+
+  return new Promise((resolve, reject) => {         
+    navigator.mediaDevices.getUserMedia(constraints)
+      .then(stream => {
+          element.elt.srcObject = stream;
+          element.elt.play();
+      })
+      .catch(error => {
+          console.log(error);
+          reject(error);
+      });
+  });
+}
+
 // Make element draggable ---------------------------------------------------------------------------------------
-// Reference from w3schools: https://www.w3schools.com/howto/howto_js_draggable.asp
+// Code from w3schools: https://www.w3schools.com/howto/howto_js_draggable.asp
 
 makeElementDraggable(webcamWindowDiv);
 
 function makeElementDraggable(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  if (document.getElementById(elmnt.id + "header")) {
+  console.log(document.getElementById(elmnt.id + "Header"));
+  if (document.getElementById(elmnt.id + "Header")) {
     /* if present, the header is where you move the DIV from:*/
-    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+    document.getElementById(elmnt.id + "Header").onmousedown = dragMouseDown;
   } else {
     /* otherwise, move the DIV from anywhere inside the DIV:*/
     elmnt.onmousedown = dragMouseDown;
