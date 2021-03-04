@@ -3,8 +3,8 @@ body {
   margin: 0;
 }
 
-img {
-  font-size: 30pt;
+p, label {
+  font-size: 10pt;
 }
 
 .w3-bar {
@@ -14,11 +14,11 @@ img {
 }
 
 #drag-n-drop {
-  position: fixed;
+  position: absolute;
   left: 0;
   top: 51;
   width: 75vw;
-  height: 100vh;
+  height: 120vh;
   overflow: hidden;
   background-color: #999;
   z-index: 1;
@@ -39,20 +39,28 @@ img {
   height: 70vh;
 }
 
+#image-to-crop-container {
+  margin-top: 51;
+  width: 60vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 #image-to-crop {
   border: 1px solid black;
   z-index: -1;
-  height: 100vh;
-  width: auto;
-  margin-top: 51;
+  max-height: 80%;
+  max-width: 90%;
 }
 
 .ui {
-  position: fixed;
+  position: absolute;
   right: 0;
   top: 51;
-  width: 15vw;
-  height: 100vh;
+  width: 20vw;
+  height: 120vh;
   background: #eee;
   z-index: 1;
   padding: 10px 20px;
@@ -60,7 +68,15 @@ img {
 }
 
 .ui * {
-  margin: 10px 5px;
+  margin: 7px 2.5px;
+}
+
+.ui ol {
+  padding-left: 20px;
+}
+
+#id_family, #id_clss {
+  width: 130px;
 }
 
 .crop-mask {
@@ -117,12 +133,12 @@ img {
 }
 
 .texture-chooser {
-  position: fixed;
+  position: absolute;
   /* right: calc(15vw + 40px); */
   right: 15vw;
   top: 51;
-  width: 10vw;
-  height: 100vh;
+  width: 20vw;
+  height: 120vh;
   background: #ccc;
   z-index: 1;
   margin: 0;

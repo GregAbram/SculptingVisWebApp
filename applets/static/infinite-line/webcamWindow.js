@@ -84,7 +84,11 @@ let myp5 = new p5(( sketch ) => {
           margin: 0;
         `);
 
-        blackAndWhiteSlider = sketch.createSlider(0.2, 0.8, 0.3, 0.01);
+        let sliderMin = 0.2;
+        let sliderMax = 0.6;
+        let sliderDefault = 0.3;
+        let sliderStep = 0.005;
+        blackAndWhiteSlider = sketch.createSlider(sliderMin, sliderMax, sliderDefault, sliderStep);
         blackAndWhiteSlider.parent("webcamWindow");
         blackAndWhiteSlider.position(blackAndWhiteCheckbox.x + 200, blackAndWhiteCheckbox.y);
         blackAndWhiteSlider.size(220, 15);
@@ -163,6 +167,7 @@ let myp5 = new p5(( sketch ) => {
       sketch.image(webcamVideo, webcamImageX, webcamImageY, videoW, videoH);
       
       thresholdValue = blackAndWhiteSlider.value();
+      console.log(thresholdValue);
       if (blackAnhWhiteMode)
       {
         sketch.filter(THRESHOLD, thresholdValue);
@@ -243,7 +248,6 @@ makeElementDraggable(webcamWindowDiv);
 
 function makeElementDraggable(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  console.log(document.getElementById(elmnt.id + "Header"));
   if (document.getElementById(elmnt.id + "Header")) {
     /* if present, the header is where you move the DIV from:*/
     document.getElementById(elmnt.id + "Header").onmousedown = dragMouseDown;
