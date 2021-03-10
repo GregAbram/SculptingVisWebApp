@@ -1,4 +1,4 @@
-function resetHandles() {
+export function resetHandles() {
   let cropArea = $('#crop-area');
   $('.resize-handle.low.right').offset({left: cropArea.offset().left + cropArea.width() - 10, top: cropArea.offset().top + cropArea.height() - 10});
   $('.resize-handle.up.left').offset({left: cropArea.offset().left - 10, top: cropArea.offset().top - 10});
@@ -7,26 +7,33 @@ function resetHandles() {
   $('.resize-handle').draggable('option', 'containment', '#image-to-crop');
 }
 
-export default function initHandles() {
+export function initHandles() {
   $('#crop-area').append($('<div/>', {class: 'resize-handle up left'}))
   $('#crop-area').append($('<div/>', {class: 'resize-handle up right'}))
   $('#crop-area').append($('<div/>', {class: 'resize-handle low left'}))
   $('#crop-area').append($('<div/>', {class: 'resize-handle low right'}))
 
-  $('.resize-handle').draggable({scroll: false});
+  $('.resize-handle').draggable({scroll: false, containment: '#image-to-crop'});
   resetHandles();
 
   // Resize the crop area based on current dragging
+  
   $('.resize-handle.low.right').on('drag', (evt, ui) => {
-    let newSize = evt.clientY - $('#crop-area').offset().top;
+    // let newSize = evt.clientY - $('#crop-area').offset().top;
+    let newSize = ui.offset.top - $('#crop-area').offset().top;
+    if (newSize < 30) {
+      newSize = 30;
+    }
     $('#crop-area').css({
       height: newSize,
       width: newSize,
     });
     ui.position.left = newSize - 10;
+    ui.position.top = newSize - 10;
     resetHandles();
     $('#crop-area').draggable('option', 'containment', '#image-to-crop');
   });
+
   $('.resize-handle.up.left').on('drag', (evt, ui) => {
     let originalPosition = $('#crop-area').offset();
     let newSize = $('#crop-area').height() - (evt.clientY - $('#crop-area').offset().top);
@@ -41,12 +48,13 @@ export default function initHandles() {
     resetHandles();
     $('#crop-area').draggable('option', 'containment', '#image-to-crop');
   });
+
   $('.resize-handle.up.right').on('drag', (evt, ui) => {
     let originalPosition = $('#crop-area').offset();
     let newSize = $('#crop-area').height() - (evt.clientY - $('#crop-area').offset().top);
     $('#crop-area').css({
-      height: newSize,
-      width: newSize,
+      height: 12,
+      width: 12,
       left: originalPosition.left,
       top: evt.clientY,
     });
@@ -55,6 +63,7 @@ export default function initHandles() {
     resetHandles();
     $('#crop-area').draggable('option', 'containment', '#image-to-crop');
   });
+
   $('.resize-handle.low.left').on('drag', (evt, ui) => {
     let originalPosition = $('#crop-area').offset();
     let newSize = evt.clientY - $('#crop-area').offset().top;

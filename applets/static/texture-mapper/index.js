@@ -1,9 +1,53 @@
 import { importWasm } from './loadWasm.js'
-import initHandles from './handles.js'
+import { initHandles, resetHandles } from './handles.js'
 import { updateActiveThumbnail, setCropBackground, setCropContainment,
   setImage, getCroppedImageData, getCroppedImageToSave, updateCropMask,
   createThumbnailSelector, setCropNormalMap } from './crop.js'
 import { storage } from './storage.js'
+
+function setCropAreaInitialSize() {
+  let imgWidth = $('#image-to-crop').width();
+  let imgHeight = $('#image-to-crop').height();
+  let cropWidth = Math.min(imgWidth, imgHeight);
+  $('#crop-area').width(cropWidth);
+  $('#crop-area').height(cropWidth);
+  resetHandles();
+}
+
+function setCropAreaPosition() {
+  let imagePos = $('#image-to-crop').offset();
+  $('#crop-area').css({ top: imagePos.top, left: imagePos.left });
+  resetHandles();
+}
+
+function setImageSize() {
+  let imgWidth = $('#image-to-crop').width();
+  let imgHeight = $('#image-to-crop').height();
+  let imgAspectRatio = imgWidth / imgHeight;
+  let containerWidth = $('#crop-container').width();
+  let containerHeight = $('#crop-container').height();
+
+  console.log("imgWidth: " + imgWidth + " imgHeight: " +  imgHeight);
+
+  var img = document.getElementById('image-to-crop'); 
+  var width = img.naturalWidth;
+  var height = img.naturalHeight;
+
+  console.log("width: " + width + " height: " +  height);
+
+  // if (imgWidth > imgHeight) {
+  //   $('#image-to-crop').width(0.8 * containerWidth);
+  //   $('#image-to-crop').height($('#image-to-crop').width() / imgAspectRatio);
+  // }
+  // else if (imgWidth < imgHeight) {
+  //   $('#image-to-crop').height(0.8 * containerHeight);
+  //   $('#image-to-crop').width($('#image-to-crop').height() * imgAspectRatio);
+  // }
+  // else {
+  //   $('#image-to-crop').width(0.8 * containerWidth);
+  //   $('#image-to-crop').height($('#image-to-crop').width());
+  // }
+}
 
 function setup() {
   // Try to load the image url from storage (don't lose data over refresh)
@@ -22,16 +66,16 @@ function setup() {
     $('#drag-n-drop').css('display', 'none');
   }
 
-  $('#file-upload').on('change', (evt) => {
-    if (!evt.target.files || !evt.target.files[0]) {
-      alert('No files uploaded!');
-      return;
-    }
+  // $('#file-upload').on('change', (evt) => {
+  //   if (!evt.target.files || !evt.target.files[0]) {
+  //     alert('No files uploaded!');
+  //     return;
+  //   }
 
-    let reader = new FileReader();
-    $(reader).on('load', (evt) => setImage(evt.target.result));
-    reader.readAsDataURL(evt.target.files[0]);
-  });
+  //   let reader = new FileReader();
+  //   $(reader).on('load', (evt) => setImage(evt.target.result));
+  //   reader.readAsDataURL(evt.target.files[0]);
+  // });
 
   $('#crop-area').draggable({scroll: false, containment: '#image-to-crop'});
   $('#crop-area').append($('<div/>', {class: 'crop-mask left'}));
@@ -112,10 +156,14 @@ function setup() {
 
     let reader = new FileReader();
     $(reader).on('load', (evt) => {
-      console.log(evt.target.result);
+      // console.log(evt.target.result);
       setImage(evt.target.result);
     });
     reader.readAsDataURL(e.dataTransfer.files[0]);
+
+    setCropAreaInitialSize();
+    setCropAreaPosition();
+    setImageSize();
   });
   $('body').on('dragover', (evt) => {
     evt.preventDefault();
@@ -135,12 +183,12 @@ function setup() {
     }, 500);
   });
 
-  $('#new-project').on('click', (evt) => {
-    storage = {};
-    storage.projectName = 'TEXTURE';
-    document.getElementById('project-name').value = 'TEXTURE';
-    window.location.reload();
-  });
+  // $('#new-project').on('click', (evt) => {
+  //   storage = {};
+  //   storage.projectName = 'TEXTURE';
+  //   document.getElementById('project-name').value = 'TEXTURE';
+  //   window.location.reload();
+  // });
 }
 
 window.onload = () => {
