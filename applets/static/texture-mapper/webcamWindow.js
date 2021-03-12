@@ -6,6 +6,10 @@ var webcamVideo;
 const webcamWindowDiv = document.getElementById("webcamWindow");
 const webcamWindowDivStyles = {
   display: 'none',
+  position: 'absolute',
+  zIndex: 100,
+  top: '20%', 
+  left: '30%', 
   boxShadow: '1px 2px 25px -5px rgba(0,0,0,0.74)',
   webkitBoxShadow: '1px 2px 25px -5px rgba(0,0,0,0.74)',
   mozBoxShadow: '1px 2px 25px -5px rgba(0,0,0,0.74)'

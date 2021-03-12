@@ -82,9 +82,18 @@ p, label {
   padding-left: 20px;
 }
 
-#id_family, #id_clss {
-  width: 130px;
+/* Upload Form styles */
+
+#upload_form, #upload_form table {
+  margin: 0;
 }
+
+input#id_family, input#id_clss {
+  width: 130px;
+  margin: 0;
+}
+
+/* Crop masks */
 
 .crop-mask {
   filter: brightness(70%);
