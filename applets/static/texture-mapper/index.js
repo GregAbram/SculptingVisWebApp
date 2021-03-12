@@ -5,7 +5,7 @@ import { updateActiveThumbnail, setCropBackground, setCropContainment,
   createThumbnailSelector, setCropNormalMap } from './crop.js'
 import { storage } from './storage.js'
 
-function setCropAreaInitialSize() {
+function initCropAreaSize() {
   let imgWidth = $('#image-to-crop').width();
   let imgHeight = $('#image-to-crop').height();
   let cropWidth = Math.min(imgWidth, imgHeight);
@@ -14,39 +14,15 @@ function setCropAreaInitialSize() {
   resetHandles();
 }
 
-function setCropAreaPosition() {
+function initCropAreaPosition() {
   let imagePos = $('#image-to-crop').offset();
   $('#crop-area').css({ top: imagePos.top, left: imagePos.left });
   resetHandles();
 }
 
-function setImageSize() {
-  let imgWidth = $('#image-to-crop').width();
-  let imgHeight = $('#image-to-crop').height();
-  let imgAspectRatio = imgWidth / imgHeight;
-  let containerWidth = $('#crop-container').width();
-  let containerHeight = $('#crop-container').height();
-
-  console.log("imgWidth: " + imgWidth + " imgHeight: " +  imgHeight);
-
-  var img = document.getElementById('image-to-crop'); 
-  var width = img.naturalWidth;
-  var height = img.naturalHeight;
-
-  console.log("width: " + width + " height: " +  height);
-
-  // if (imgWidth > imgHeight) {
-  //   $('#image-to-crop').width(0.8 * containerWidth);
-  //   $('#image-to-crop').height($('#image-to-crop').width() / imgAspectRatio);
-  // }
-  // else if (imgWidth < imgHeight) {
-  //   $('#image-to-crop').height(0.8 * containerHeight);
-  //   $('#image-to-crop').width($('#image-to-crop').height() * imgAspectRatio);
-  // }
-  // else {
-  //   $('#image-to-crop').width(0.8 * containerWidth);
-  //   $('#image-to-crop').height($('#image-to-crop').width());
-  // }
+export function initCropArea() {
+  initCropAreaSize();
+  initCropAreaPosition();
 }
 
 function setup() {
@@ -99,7 +75,7 @@ function setup() {
   $('button#export').on('click', (evt) => {
     let form = document.getElementById('upload_form');
     let fd = new FormData(form);
-    let names = []
+    let names = [];
 
     let imgs = storage.imgData;
     for (let i in imgs)
@@ -156,14 +132,11 @@ function setup() {
 
     let reader = new FileReader();
     $(reader).on('load', (evt) => {
-      // console.log(evt.target.result);
+      console.log(evt.target.result);
       setImage(evt.target.result);
+      setTimeout(initCropArea, 10);
     });
     reader.readAsDataURL(e.dataTransfer.files[0]);
-
-    setCropAreaInitialSize();
-    setCropAreaPosition();
-    setImageSize();
   });
   $('body').on('dragover', (evt) => {
     evt.preventDefault();

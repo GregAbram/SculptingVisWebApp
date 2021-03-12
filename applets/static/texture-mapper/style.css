@@ -41,33 +41,25 @@ p, label {
   top: 0;
   width: 70vh;
   height: 70vh;
+  cursor: move;
 }
 
 #crop-container {
   margin-top: 51;
   width: 80vw;
-  height: 100vh;
+  height: 90vh;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-#image-to-crop-container {
-  position: relative;
-  top: 51;
-  max-height: 80%;
-  max-width: 90%;
-  border: 2px solid red;
-}
-
 #image-to-crop {
-  /* border: 1px solid black; */
   box-shadow: 0px 0px 17px 4px rgba(0,0,0,0.54);
   -webkit-box-shadow: 0px 0px 17px 4px rgba(0,0,0,0.54);
   -moz-box-shadow: 0px 0px 17px 4px rgba(0,0,0,0.54);
   z-index: -1;
-  /* max-height: 80%;
-  max-width: 90%; */
+  max-height: 80%;
+  max-width: 90%;
 }
 
 .ui {
@@ -145,6 +137,19 @@ p, label {
 }
 .resize-handle.low {
   top: calc(100% - 10px);
+}
+
+.resize-handle.up.left {
+  cursor: nwse-resize;
+}
+.resize-handle.up.right {
+  cursor: nesw-resize;
+}
+.resize-handle.low.left {
+  cursor: nesw-resize;
+}
+.resize-handle.low.right {
+  cursor: nwse-resize;
 }
 
 .texture-chooser {

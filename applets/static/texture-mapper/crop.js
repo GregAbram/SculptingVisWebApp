@@ -140,13 +140,6 @@ function loadNormalMapToImage(imgIndex) {
 
     let cropAreaHeight = $('#crop-area').height();
 
-    // let offset = $('#crop-area').offset();
-    // ctx.drawImage(
-    //   normImg, scaleFactorX * offset.left, scaleFactorY * offset.top,
-    //   scaleFactorX * cropAreaHeight, scaleFactorY * cropAreaHeight, 0, 0,
-    //   EXPORT_WIDTH, EXPORT_HEIGHT
-    // );
-
     let imgOffset = $('#image-to-crop').offset();
     let offset = $('#crop-area').offset();
     let sourceX = scaleFactorX * offset.left - imgOffset.left;
@@ -184,13 +177,6 @@ export function getCroppedImageToSave(gradIndex, imgType) {
   let cropAreaHeight = $('#crop-area').height();
   exportCanvas.width = EXPORT_WIDTH;
   exportCanvas.height = EXPORT_HEIGHT;
-
-  // let offset = $('#crop-area').offset();
-  // ctx.drawImage(
-  //   croppedImg, scaleFactorX * offset.left, scaleFactorY * offset.top,
-  //   scaleFactorX * cropAreaHeight, scaleFactorY * cropAreaHeight, 0, 0,
-  //   EXPORT_WIDTH, EXPORT_HEIGHT
-  // );
 
   let imgOffset = $('#image-to-crop').offset();
   let offset = $('#crop-area').offset();
