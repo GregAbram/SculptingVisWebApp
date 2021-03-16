@@ -10,7 +10,7 @@ NORM_CANVAS.height = EXPORT_HEIGHT;
 
 export function updateCropMask() {
   if (document.getElementById('show-repeat-preview').checked) {
-    $('.crop-mask').css('background-image', 'url(' + getCroppedImageURL() + ')');
+    $('.crop-mask').css('background-image', 'url(' + getCroppedImageToSave(0, 'image/png') + ')');
   } else {
     $('.crop-mask').css('background-image', 'none');
   }
@@ -36,7 +36,8 @@ export function setCropNormalMap() {
 }
 
 export function setCropContainment() {
-  $('#crop-area').draggable('option', 'containment', '#image-to-crop');
+  // $('#crop-area').draggable('option', 'containment', '#image-to-crop');
+  $('#crop-area').draggable({ containment: '#image-to-crop' });
 }
 
 // Set the image background from a newly uploaded image
@@ -86,7 +87,8 @@ export function getCroppedImageData(gradIndex, imgType) {
   let exportCanvas = document.createElement('canvas');
   let ctx = exportCanvas.getContext('2d');
 
-  let imgs = storage[imgType];
+  // let imgs = storage[imgType];
+  let imgs = storage.imgData;
   let cropImgData = imgs[gradIndex];
   let croppedImg = document.createElement('img');
   croppedImg.src = cropImgData;
@@ -101,11 +103,16 @@ export function getCroppedImageData(gradIndex, imgType) {
   exportCanvas.width = EXPORT_WIDTH;
   exportCanvas.height = EXPORT_HEIGHT;
 
+  let imgOffset = $('#image-to-crop').offset();
   let offset = $('#crop-area').offset();
+  let sourceX = scaleFactorX * offset.left - imgOffset.left;
+  let sourceY = scaleFactorY * offset.top - imgOffset.top;
+  let sourceWidth = scaleFactorX * cropAreaHeight;
+  let sourceHeight = scaleFactorY * cropAreaHeight;
   ctx.drawImage(
-    croppedImg, scaleFactorX * offset.left, scaleFactorY * offset.top,
-    scaleFactorX * cropAreaHeight, scaleFactorY * cropAreaHeight, 0, 0,
-    EXPORT_WIDTH, EXPORT_HEIGHT
+    croppedImg, 
+    sourceX, sourceY, sourceWidth, sourceHeight, 
+    0, 0, EXPORT_WIDTH, EXPORT_HEIGHT
   );
 
   return ctx.getImageData(0, 0, EXPORT_WIDTH, EXPORT_WIDTH);
@@ -113,7 +120,7 @@ export function getCroppedImageData(gradIndex, imgType) {
 
 // Returns data URL to updated cropped image
 export function getCroppedImageURL(gradIndex, imgType) {
-  return getCroppedImage(gradIndex, imgType).toDataURL('image/png');
+  return getCroppedImageData(gradIndex, imgType).toDataURL('image/png');
 }
 
 // Sets the image preview for the normal map
@@ -133,12 +140,18 @@ function loadNormalMapToImage(imgIndex) {
 
     let cropAreaHeight = $('#crop-area').height();
 
+    let imgOffset = $('#image-to-crop').offset();
     let offset = $('#crop-area').offset();
+    let sourceX = scaleFactorX * offset.left - imgOffset.left;
+    let sourceY = scaleFactorY * offset.top - imgOffset.top;
+    let sourceWidth = scaleFactorX * cropAreaHeight;
+    let sourceHeight = scaleFactorY * cropAreaHeight;
     ctx.drawImage(
-      normImg, scaleFactorX * offset.left, scaleFactorY * offset.top,
-      scaleFactorX * cropAreaHeight, scaleFactorY * cropAreaHeight, 0, 0,
-      EXPORT_WIDTH, EXPORT_HEIGHT
+      normImg, 
+      sourceX, sourceY, sourceWidth, sourceHeight, 
+      0, 0, EXPORT_WIDTH, EXPORT_HEIGHT
     );
+
     let data = NORM_CANVAS.toDataURL('image/png');
     document.getElementById('normal-map-preview').src = data;
   });
@@ -155,7 +168,7 @@ export function getCroppedImageToSave(gradIndex, imgType) {
   let cropImgData = imgs[gradIndex];
   let croppedImg = document.createElement('img');
   croppedImg.src = cropImgData;
-  document.body.appendChild(croppedImg);
+  // document.body.appendChild(croppedImg);
 
   let img = document.getElementById('image-to-crop');
   let scaleFactorX = img.naturalWidth / img.width;
@@ -165,12 +178,18 @@ export function getCroppedImageToSave(gradIndex, imgType) {
   exportCanvas.width = EXPORT_WIDTH;
   exportCanvas.height = EXPORT_HEIGHT;
 
+  let imgOffset = $('#image-to-crop').offset();
   let offset = $('#crop-area').offset();
+  let sourceX = scaleFactorX * offset.left - imgOffset.left;
+  let sourceY = scaleFactorY * offset.top - imgOffset.top;
+  let sourceWidth = scaleFactorX * cropAreaHeight;
+  let sourceHeight = scaleFactorY * cropAreaHeight;
   ctx.drawImage(
-    croppedImg, scaleFactorX * offset.left, scaleFactorY * offset.top,
-    scaleFactorX * cropAreaHeight, scaleFactorY * cropAreaHeight, 0, 0,
-    EXPORT_WIDTH, EXPORT_HEIGHT
+    croppedImg, 
+    sourceX, sourceY, sourceWidth, sourceHeight, 
+    0, 0, EXPORT_WIDTH, EXPORT_HEIGHT
   );
+
   // document.body.removeChild(croppedImg);
   return exportCanvas.toDataURL('image/png');
 }

@@ -1,9 +1,29 @@
 import { importWasm } from './loadWasm.js'
-import initHandles from './handles.js'
+import { initHandles, resetHandles } from './handles.js'
 import { updateActiveThumbnail, setCropBackground, setCropContainment,
   setImage, getCroppedImageData, getCroppedImageToSave, updateCropMask,
   createThumbnailSelector, setCropNormalMap } from './crop.js'
 import { storage } from './storage.js'
+
+function initCropAreaSize() {
+  let imgWidth = $('#image-to-crop').width();
+  let imgHeight = $('#image-to-crop').height();
+  let cropWidth = Math.min(imgWidth, imgHeight);
+  $('#crop-area').width(cropWidth);
+  $('#crop-area').height(cropWidth);
+  resetHandles();
+}
+
+function initCropAreaPosition() {
+  let imagePos = $('#image-to-crop').offset();
+  $('#crop-area').css({ top: imagePos.top, left: imagePos.left });
+  resetHandles();
+}
+
+export function initCropArea() {
+  initCropAreaSize();
+  initCropAreaPosition();
+}
 
 function setup() {
   // Try to load the image url from storage (don't lose data over refresh)
@@ -22,16 +42,16 @@ function setup() {
     $('#drag-n-drop').css('display', 'none');
   }
 
-  $('#file-upload').on('change', (evt) => {
-    if (!evt.target.files || !evt.target.files[0]) {
-      alert('No files uploaded!');
-      return;
-    }
+  // $('#file-upload').on('change', (evt) => {
+  //   if (!evt.target.files || !evt.target.files[0]) {
+  //     alert('No files uploaded!');
+  //     return;
+  //   }
 
-    let reader = new FileReader();
-    $(reader).on('load', (evt) => setImage(evt.target.result));
-    reader.readAsDataURL(evt.target.files[0]);
-  });
+  //   let reader = new FileReader();
+  //   $(reader).on('load', (evt) => setImage(evt.target.result));
+  //   reader.readAsDataURL(evt.target.files[0]);
+  // });
 
   $('#crop-area').draggable({scroll: false, containment: '#image-to-crop'});
   $('#crop-area').append($('<div/>', {class: 'crop-mask left'}));
@@ -55,7 +75,7 @@ function setup() {
   $('button#export').on('click', (evt) => {
     let form = document.getElementById('upload_form');
     let fd = new FormData(form);
-    let names = []
+    let names = [];
 
     let imgs = storage.imgData;
     for (let i in imgs)
@@ -114,6 +134,7 @@ function setup() {
     $(reader).on('load', (evt) => {
       console.log(evt.target.result);
       setImage(evt.target.result);
+      setTimeout(initCropArea, 10);
     });
     reader.readAsDataURL(e.dataTransfer.files[0]);
   });
@@ -135,12 +156,12 @@ function setup() {
     }, 500);
   });
 
-  $('#new-project').on('click', (evt) => {
-    storage = {};
-    storage.projectName = 'TEXTURE';
-    document.getElementById('project-name').value = 'TEXTURE';
-    window.location.reload();
-  });
+  // $('#new-project').on('click', (evt) => {
+  //   storage = {};
+  //   storage.projectName = 'TEXTURE';
+  //   document.getElementById('project-name').value = 'TEXTURE';
+  //   window.location.reload();
+  // });
 }
 
 window.onload = () => {

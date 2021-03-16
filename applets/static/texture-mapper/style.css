@@ -1,22 +1,27 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   overflow: hidden;
   margin: 0;
 }
 
-img {
-  font-size: 30pt;
+p, label {
+  font-size: 10pt;
 }
 
 .w3-bar {
   position: fixed;
   z-index: 100;
+  top: 0;
 }
 
 #drag-n-drop {
   position: fixed;
   left: 0;
   top: 51;
-  width: 75vw;
+  width: 80vw;
   height: 100vh;
   overflow: hidden;
   background-color: #999;
@@ -33,24 +38,35 @@ img {
   border: 1px solid black;
   position: absolute;
   left: 0;
-  top: 51;
+  top: 0;
   width: 70vh;
   height: 70vh;
+  cursor: move;
+}
+
+#crop-container {
+  margin-top: 51;
+  width: 80vw;
+  height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #image-to-crop {
-  border: 1px solid black;
+  box-shadow: 0px 0px 17px 4px rgba(0,0,0,0.54);
+  -webkit-box-shadow: 0px 0px 17px 4px rgba(0,0,0,0.54);
+  -moz-box-shadow: 0px 0px 17px 4px rgba(0,0,0,0.54);
   z-index: -1;
-  height: 100vh;
-  width: auto;
-  margin-top: 51;
+  max-height: 80%;
+  max-width: 90%;
 }
 
 .ui {
   position: fixed;
   right: 0;
   top: 51;
-  width: 15vw;
+  width: 20vw;
   height: 100vh;
   background: #eee;
   z-index: 1;
@@ -59,8 +75,25 @@ img {
 }
 
 .ui * {
-  margin: 10px 5px;
+  margin: 7px 2.5px;
 }
+
+.ui ol {
+  padding-left: 20px;
+}
+
+/* Upload Form styles */
+
+#upload_form, #upload_form table {
+  margin: 0;
+}
+
+input#id_family, input#id_clss {
+  width: 130px;
+  margin: 0;
+}
+
+/* Crop masks */
 
 .crop-mask {
   filter: brightness(70%);
@@ -115,12 +148,25 @@ img {
   top: calc(100% - 10px);
 }
 
+.resize-handle.up.left {
+  cursor: nwse-resize;
+}
+.resize-handle.up.right {
+  cursor: nesw-resize;
+}
+.resize-handle.low.left {
+  cursor: nesw-resize;
+}
+.resize-handle.low.right {
+  cursor: nwse-resize;
+}
+
 .texture-chooser {
-  position: fixed;
+  position: absolute;
   /* right: calc(15vw + 40px); */
   right: 15vw;
   top: 51;
-  width: 10vw;
+  width: 20vw;
   height: 100vh;
   background: #ccc;
   z-index: 1;
