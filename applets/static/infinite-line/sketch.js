@@ -270,6 +270,15 @@ function setup() {
   let saveButton = createButton('Save to Library');
   saveButton.position(canvas.position().x + 20, canvas.position().y + 440);
   saveButton.mousePressed(saveToLibrary);
+  
+  let webcamButton = createButton('Take A Photo With Your Webcam');
+  webcamButton.position(canvas.position().x + 20, canvas.position().y + 520);
+  webcamButton.size(230, 60);
+
+  webcamButton.mousePressed(() => {
+    webcamWindowDiv.style.display = "block";
+    reopenWebcam(webcamVideo);
+  });
 }
 
 
