@@ -61,16 +61,16 @@ def upload_glyph(request):
     a['artifactData'] = {
       'lods': [
         {
-          'mesh': 'LOD1.obj',
-          'normal': 'LOD1.png'
+          'mesh': 'meshes/LOD1.obj',
+          'normal': 'normalmaps/LOD1.png'
         },
         {
-          'mesh': 'LOD2.obj',
-          'normal': 'LOD2.png'
+          'mesh': 'meshes/LOD2.obj',
+          'normal': 'normalmaps/LOD2.png'
         },
         {
-          'mesh': 'LOD3.obj',
-          'normal': 'LOD3.png'
+          'mesh': 'meshes/LOD3.obj',
+          'normal': 'normalmaps/LOD3.png'
         }
       ]
     }
