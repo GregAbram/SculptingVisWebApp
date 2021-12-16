@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 from uuid import uuid1
 from django.views.generic.edit import FormView
@@ -117,7 +118,7 @@ def showtype(request, typ):
       if (doc):
         row.append(artifact_name(doc))
       else:
-        row.append('none')
+        row.append(False)
     grid.append(row)
   if typ == 'colormap' or typ == 'line':
     wid = 200
@@ -126,6 +127,7 @@ def showtype(request, typ):
     wid = 100
     ht = 100
   params = { 'label': typ, 'grid': grid, 'width': wid, 'height': ht}
+  print(grid, file=sys.stderr)
   return render(request, 'library/grid.html', params)
 
 def showtypefam(request, typ, fam):
@@ -140,7 +142,7 @@ def showtypefam(request, typ, fam):
     if len(column) > maxl: maxl = len(column)
     columns.append(column)
   for i in range(len(columns)):
-    columns[i] = columns[i] + ['none']*(maxl - len(columns[i]))
+    columns[i] = columns[i] + [False]*(maxl - len(columns[i]))
   grid = [[""] + classes]
   for i in range(maxl):
     row = [""] + [columns[j][i] for j in range(len(classes))]
@@ -152,6 +154,7 @@ def showtypefam(request, typ, fam):
     wid = 100
     ht = 100
   params = { 'label': typ + ' ' + fam, 'grid': grid, 'width': wid, 'height': ht}
+  print(grid, file=sys.stderr)
   return render(request, 'library/grid.html', params)
 
 def showtypeclass(request, typ, clss):
@@ -167,7 +170,7 @@ def showtypeclass(request, typ, clss):
     rows.append(row)
   for i in range(len(rows)):
     print(rows[i])
-    rows[i] = rows[i] + ['none']*(maxl - len(rows[i]))
+    rows[i] = rows[i] + [False]*(maxl - len(rows[i]))
   grid = [[""]*maxl]
   for i in range(len(families)):
     rows[i] = [families[i]] + rows[i]
@@ -179,9 +182,8 @@ def showtypeclass(request, typ, clss):
     wid = 100
     ht = 100
   params = { 'label': typ + ' ' + clss, 'grid': grid, 'width': wid, 'height': ht}
+  print(grid, file=sys.stderr)
   return render(request, 'library/grid.html', params)
-  print(clss)
-  return showlib(request)
 
 def deleteselectedartifacts(request, uuids):
   uuids = uuids.split(',')

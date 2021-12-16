@@ -39,11 +39,15 @@
       let d = document.createElement('td');
       r.appendChild(d);
 
-      img = document.createElement('img');
-      img.setAttribute('src', "{% static 'Artifacts/' %}" + uuid + '/thumbnail.png')
-      img.setAttribute('alt', '(none)');
-      img.setAttribute('onerror', 'this.onerror=null');
-      img.setAttribute('width', '100');
+      console.log("XXXXXX ", uuid);
+      if (uuid != 'none')
+      {
+        img = document.createElement('img');
+        img.setAttribute('src', "{% static 'Artifacts/' %}" + uuid + '/thumbnail.png')
+        img.setAttribute('alt', '(none)');
+        img.setAttribute('onerror', 'this.onerror=null');
+        img.setAttribute('width', '100');
+      }
 
       d.appendChild(img);
 
@@ -157,42 +161,21 @@
 	}, "html");
   }
 
-  var ShowType = function(t)  {
-    if (t === 'glyph')
-    {
-      document.getElementById('glyph-selector').classList.add('w3-white');
-      document.getElementById('colormap-selector').classList.remove('w3-white');
-      document.getElementById('texture-selector').classList.remove('w3-white');
-      document.getElementById('line-selector').classList.remove('w3-white');
-    }
-    else if (t === 'colormap')
-    {
-      document.getElementById('glyph-selector').classList.remove('w3-white');
-      document.getElementById('colormap-selector').classList.add('w3-white');
-      document.getElementById('texture-selector').classList.remove('w3-white');
-      document.getElementById('line-selector').classList.remove('w3-white');
-    }
-    else if (t === 'texture')
-    {
-      document.getElementById('glyph-selector').classList.remove('w3-white');
-      document.getElementById('colormap-selector').classList.remove('w3-white');
-      document.getElementById('texture-selector').classList.add('w3-white');
-      document.getElementById('line-selector').classList.remove('w3-white');
-    }
-    else if (t === 'line')
-    {
-      document.getElementById('glyph-selector').classList.remove('w3-white');
-      document.getElementById('colormap-selector').classList.remove('w3-white');
-      document.getElementById('texture-selector').classList.remove('w3-white');
-      document.getElementById('line-selector').classList.add('w3-white');
-    }
-    artifact_type = t;
+  var lastType;
+
+  var ShowType = function(me)  {
+    if (lastType)
+	lastType.style.backgroundColor = "#A1998F"
+    lastType = me;
+    me.style.backgroundColor = "lightgrey";
+
+    artifact_type = me.innerText;
     ShowArtifacts();
   }
 
   $(document).ready(function()
   {
-	ShowType('glyph');
+    ShowType(document.getElementById("glyphs_menu_item"));
   });
 
 </script>
@@ -200,17 +183,28 @@
 <title>W3.CSS Template</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
-body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
+
+h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
 .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
+
 .fa-anchor,.fa-coffee {font-size:200px}
-html, body {
+
+html {
+    background-color: #A1998F;
+}
+
+div table tbody tr td {
+    background-color: #A1998F;
+}
+
+body {
+    background-color: #A1998F;
     height: 100%;
 }
+
 #exportZone {
   text-align: center;
   vertical-align: middle;
@@ -232,41 +226,66 @@ html, body {
   right: 0;
 }
 
+titlebar {
+  display: grid;
+  padding-top: 10px;
+  grid-template-columns:  1fr 1fr;
+  width: 100%;
+  border-bottom: 1px solid black;
+}
+
+pagename {
+  grid-column: 1;
+  font-size: xx-large;
+}
+
+options {
+  grid-column: 2;
+  display: grid;
+  justify-self: right;
+{% if islocal == True %}
+  grid-template-columns: repeat(5, 1fr);
+{% else %}
+  grid-template-columns: repeat(4, 1fr);
+{% endif %}
+}
+
+option {
+  text-transform: uppercase;
+  justify-self: center;
+  align-self: end;
+  margin-bottom: 3px;
+  padding-top: 3px;
+}
+
 </style>
 
 <body>
-
-<div style="outline: 1px solid black;">
-  <table style="width: 100%">
-    <tr>
-      <td>
-        <div class="w3-bar w3-dark-grey w3-card w3-left-align w3-large">
-          <a id="glyph-selector" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-white" onclick="ShowType('glyph')">glyphs</a>
-          <a id="colormap-selector" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="ShowType('colormap')">colormaps</a>
-          <a id="texture-selector" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="ShowType('texture')">textures</a>
-          <a id="line-selector" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" onclick="ShowType('line')">lines</a>
-      </td>
+  <titlebar>
+    <pagename>
+      SculptingVis Artifact Library
+    </pagename>
+    <options>
+      <option id=glyphs_menu_item onClick="ShowType(this);">glyph</option>
+      <option id=colormaps_menu_item onClick="ShowType(this);">colormap</option>
+      <option id=textures_menu_item onClick="ShowType(this);">texture</option>
+      <option id=lines_menu_item onClick="ShowType(this);">line</option>
 {% if islocal == True %}
-      <td>
-        <div id=exportZone ondrop="exportArtifact(event)" ondragover="allowDropArtifact(event)"><small>
-          <div>Export Zone</div>
-            <table style='width: 100%'>
-              <tr>
-                <td>directory:</td>
-                <td><input id='dropDir' type='text' value='(required)'></td>
-              </tr><tr>
-                <td>name:</td>
-                <td><input id='dropName' type='text' value='(required)'></td>
-              </tr>
-            </table>
-          </div>
-      </td>
+      <div id=exportZone ondrop="exportArtifact(event)" ondragover="allowDropArtifact(event)"><small>
+	<div>Export Zone</div>
+	<table style='width: 100%'>
+	  <tr>
+	    <td>directory:</td>
+	    <td><input id='dropDir' type='text' value='(required)'></td>
+	  </tr><tr>
+	    <td>name:</td>
+	    <td><input id='dropName' type='text' value='(required)'></td>
+	  </tr>
+	</table>
+      </div>
 {% endif %}
-      <td>
-      </td>
-    </tr>
-  </table>
-</div>
+    </options>
+  </titlebar>
 
 <div name='grid' style="height: 100%; overflow: auto;" ondrop="dropArtifact(event)" ondragover="allowDropArtifact(event)"></div>
 

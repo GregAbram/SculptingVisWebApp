@@ -6,8 +6,7 @@
   .thumbnail::-webkit-scrollbar-thumb { background: lightgrey; }
 </style>
 
-<h1>{{label}} Artifacts</h1>
-<table>
+<table style="margin-top: 20px; margin-left: 20px;">
   {% for row in grid %}
     <tr>
     {% if forloop.first %}
@@ -25,10 +24,12 @@
         {% else %}
           <td>
             <div class=thumbnail style="width: {{width}}px; height: {{height}}px; overflow-x: scroll; overflow-y: hidden">
+              {% if col %}
               <img draggable="true" ondragstart="sendArtifact(event, '{{col}}')" 
                    onclick="selectedArtifact(event, '{{col}}')" 
                    src={% static '/Artifacts/'|add:col|add:'/thumbnail.png' %} 
                    alt="(none)" onError="this.onerror=null">
+	      {% endif %}
             </div>
           </td>
         {% endif %}
