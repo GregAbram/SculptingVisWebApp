@@ -23,11 +23,11 @@
           <th><div onclick="ShowFamily('{{col}}');" style="cursor: pointer;">{{col}}</div></th>
         {% else %}
           <td>
-            <div class=thumbnail style="width: {{width}}px; height: {{height}}px; overflow-x: scroll; overflow-y: hidden">
+            <div class=thumbnail style="width: {{width}}px; height: {{height}}px; overflow-x: auto; overflow-y: hidden">
               {% if col %}
-              <img draggable="true" ondragstart="sendArtifact(event, '{{col}}')" 
-                   onclick="selectedArtifact(event, '{{col}}')" 
-                   src={% static '/Artifacts/'|add:col|add:'/thumbnail.png' %} 
+              <img draggable="true" ondragstart="sendArtifact(event, '{{col}}')"
+                   onclick="selectedArtifact(event, '{{col}}')"
+                   src={% static '/Artifacts/'|add:col|add:'/thumbnail.png' %}
                    alt="(none)" onError="this.onerror=null">
 	      {% endif %}
             </div>
