@@ -127,7 +127,6 @@ def showtype(request, typ):
     wid = 100
     ht = 100
   params = { 'label': typ, 'grid': grid, 'width': wid, 'height': ht}
-  print(grid, file=sys.stderr)
   return render(request, 'library/grid.html', params)
 
 def showtypefam(request, typ, fam):
@@ -154,7 +153,6 @@ def showtypefam(request, typ, fam):
     wid = 100
     ht = 100
   params = { 'label': typ + ' ' + fam, 'grid': grid, 'width': wid, 'height': ht}
-  print(grid, file=sys.stderr)
   return render(request, 'library/grid.html', params)
 
 def showtypeclass(request, typ, clss):
@@ -182,7 +180,6 @@ def showtypeclass(request, typ, clss):
     wid = 100
     ht = 100
   params = { 'label': typ + ' ' + clss, 'grid': grid, 'width': wid, 'height': ht}
-  print(grid, file=sys.stderr)
   return render(request, 'library/grid.html', params)
 
 def deleteselectedartifacts(request, uuids):
