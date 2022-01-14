@@ -1,4 +1,5 @@
-const webcamWindowDiv = document.getElementById("webcamWindow");
+const wcWindow = 'webcamWindow';
+const webcamWindowDiv = document.getElementById(wcWindow);
 const webcamWindowDivStyles = {
   display: 'none',
   boxShadow: '1px 2px 25px -5px rgba(0,0,0,0.74)',
@@ -167,7 +168,6 @@ let myp5 = new p5(( sketch ) => {
       sketch.image(webcamVideo, webcamImageX, webcamImageY, videoW, videoH);
       
       thresholdValue = blackAndWhiteSlider.value();
-      console.log(thresholdValue);
       if (blackAnhWhiteMode)
       {
         sketch.filter(THRESHOLD, thresholdValue);
@@ -186,30 +186,6 @@ let myp5 = new p5(( sketch ) => {
       sketch.rect(webcamImageX, webcamImageY, overlayRectW, overlayRectH);
       sketch.rect(webcamImageX + overlayRectW + inputImgW, webcamImageY, overlayRectW, overlayRectH);
     };
-
-    sketch.keyPressed = () => {
-      switch (sketch.keyCode)
-      {
-        case RIGHT_ARROW:
-          thresholdValue += 0.05;
-          if (thresholdValue >= 1)
-          {
-            thresholdValue = 1;
-          }
-          break;
-        case LEFT_ARROW:
-          thresholdValue -= 0.05;
-          if (thresholdValue <= 0)
-          {
-            thresholdValue = 0;
-          }
-          break;
-        case 32: // SPACEBAR
-          blackAnhWhiteMode = !blackAnhWhiteMode;
-          break;
-      }
-      return false;
-    }
 });
 
 // Turn off the webcam
