@@ -120,9 +120,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATICFILES_DIRS = [
-  BASE_DIR + '/static'
-]
+STATICFILES_DIRS = [ '/home/bridger/svis/static' ]
 
 # STATIC_URL = '/static/'
 STATIC_URL = '/static/'
@@ -131,5 +129,5 @@ STATIC_ROOT = '/home/bridger/svis/static/'
 X_FRAME_OPTIONS = 'ALLOWALL'
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
 
-ARTIFACTS = BASE_DIR + 'Artifacts'
+ARTIFACTS = STATIC_ROOT + 'Artifacts'
 MONGO_DBNAME = 'curated'
