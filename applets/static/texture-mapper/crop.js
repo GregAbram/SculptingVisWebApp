@@ -87,8 +87,8 @@ export function getCroppedImageData(gradIndex, imgType) {
   let exportCanvas = document.createElement('canvas');
   let ctx = exportCanvas.getContext('2d');
 
-  // let imgs = storage[imgType];
-  let imgs = storage.imgData;
+  let imgs = storage[imgType];
+  // let imgs = storage.imgData;
   let cropImgData = imgs[gradIndex];
   let croppedImg = document.createElement('img');
   croppedImg.src = cropImgData;
