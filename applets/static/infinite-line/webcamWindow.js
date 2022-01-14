@@ -14,7 +14,7 @@ let myp5 = new p5(( sketch ) => {
 
     let backgroundColor = 'rgb(120, 120, 120)';
 
-    let videoH = 320;
+    let videoH = 720;
     let videoW = videoH * 1.333;
     let videoMargin = 10;
 
