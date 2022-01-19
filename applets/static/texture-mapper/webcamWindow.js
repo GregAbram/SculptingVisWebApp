@@ -39,7 +39,7 @@ let myp5 = new p5(( sketch ) => {
 
     let backgroundColor = 'rgb(120, 120, 120)';
 
-    let videoH = 320;
+    let videoH = 720;
     let videoW = videoH * 1.333;
     let videoMargin = 10;
 
@@ -59,11 +59,6 @@ let myp5 = new p5(( sketch ) => {
 
     let myCanvas;
     
-    var thresholdValue = 0.3; // Value between 0.0 and 1.0 for the filter(sketch.THRESHOLD)
-    var blackAnhWhiteMode = false;
-
-    let blackAndWhiteSlider;
-
     sketch.setup = () => {
         // Attach the canvas to the draggable div
         myCanvas = sketch.createCanvas(videoW + videoMargin*2, videoH + videoMargin*2 + 100);
@@ -96,39 +91,6 @@ let myp5 = new p5(( sketch ) => {
           cursor: pointer;
         `);
         snapButton.mousePressed(sketch.takeASnap);
-
-        let blackAndWhiteCheckbox = sketch.createCheckbox();
-        blackAndWhiteCheckbox.parent("webcamWindow");
-        blackAndWhiteCheckbox.position(snapButton.x, snapButton.y + 45);
-
-        let blackAndWhiteText = sketch.createP("Black and white filter");
-        blackAndWhiteText.parent("webcamWindow");
-        blackAndWhiteText.position(blackAndWhiteCheckbox.x + 20, blackAndWhiteCheckbox.y - 5);
-        blackAndWhiteText.size(myCanvas.width/2, webcamTextSize);
-        blackAndWhiteText.style(`
-          color: white;
-          margin: 0;
-        `);
-
-        let sliderMin = 0.2;
-        let sliderMax = 0.6;
-        let sliderDefault = 0.3;
-        let sliderStep = 0.005;
-        blackAndWhiteSlider = sketch.createSlider(sliderMin, sliderMax, sliderDefault, sliderStep);
-        blackAndWhiteSlider.parent("webcamWindow");
-        blackAndWhiteSlider.position(blackAndWhiteCheckbox.x + 200, blackAndWhiteCheckbox.y);
-        blackAndWhiteSlider.size(220, 15);
-        blackAndWhiteSlider.style('opacity', '0.2');
-
-        blackAndWhiteCheckbox.changed(() => {
-          blackAnhWhiteMode = blackAndWhiteCheckbox.checked();
-          if (blackAnhWhiteMode) {
-            blackAndWhiteSlider.style('opacity', '1');
-          }
-          else {
-            blackAndWhiteSlider.style('opacity', '0.15');
-          }
-        });
 
         let webcamText = sketch.createP("Webcam");
         webcamText.parent("webcamWindow");
@@ -178,45 +140,7 @@ let myp5 = new p5(( sketch ) => {
 
     sketch.draw = () => {
       sketch.image(webcamVideo, webcamImageX, webcamImageY, videoW, videoH);
-      
-      thresholdValue = blackAndWhiteSlider.value();
-
-      if (blackAnhWhiteMode)
-      {
-        sketch.filter(sketch.THRESHOLD, thresholdValue);
-
-        // Draw in the background for the webcam text and close button
-        sketch.fill(120);
-        sketch.rect(0, 0, myCanvas.width, webcamImageY);
-        sketch.rect(0, snapButtonY, myCanvas.width, 100);
-        sketch.rect(0, webcamImageY, videoMargin, videoH);
-        sketch.rect(videoMargin + videoW, webcamImageY, videoMargin, videoH);
-      }
     };
-
-    sketch.keyPressed = () => {
-      switch (sketch.keyCode)
-      {
-        case RIGHT_ARROW:
-          thresholdValue += 0.05;
-          if (thresholdValue >= 1)
-          {
-            thresholdValue = 1;
-          }
-          break;
-        case LEFT_ARROW:
-          thresholdValue -= 0.05;
-          if (thresholdValue <= 0)
-          {
-            thresholdValue = 0;
-          }
-          break;
-        case 32: // SPACEBAR
-          blackAnhWhiteMode = !blackAnhWhiteMode;
-          break;
-      }
-      return false;
-    }
 });
 
 // Turn off the webcam
