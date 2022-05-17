@@ -1,4 +1,3 @@
-import os
 import sys
 import shutil
 from uuid import uuid1
@@ -222,6 +221,7 @@ def downloadselection(request, uuids):
   return FileResponse(file, as_attachment=True, filename='SculptingVis.tgz')
 
 def downloadartifact(request, uuid):
+  print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
   with open(settings.ARTIFACTS + '/' + uuid + '/artifact.json') as f:
     desc = json.load(f)
   typ = desc['type']

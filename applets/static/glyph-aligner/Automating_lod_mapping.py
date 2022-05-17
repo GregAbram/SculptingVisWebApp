@@ -51,8 +51,8 @@ os.mkdir(os.path.join(outputDir,  'normalmaps'))
 os.mkdir(os.path.join(outputDir,  'meshes'))
 
 target_face_counts = []
-for i in range(2,len(argv)):
-	target_face_counts.append(int(argv[i]))
+for i in argv[1:]:
+	target_face_counts.append(int(i))
 
 print(target_face_counts)
 
@@ -115,6 +115,7 @@ if bpy.context.selected_objects != []:
 	bpy.ops.object.editmode_toggle()
 	bpy.ops.mesh.select_all(action='SELECT')
 	bpy.ops.mesh.mark_sharp(clear=True)
+	bpy.ops.mesh.remove_doubles() 
 	bpy.ops.mesh.faces_shade_smooth()
 	bpy.ops.object.editmode_toggle()
 
