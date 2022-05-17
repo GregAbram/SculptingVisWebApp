@@ -22,15 +22,19 @@ def artifact_name(i):
   return i['uuid']
 
 def hideArtifact(request, uuid):
-  mongo = MongoClient('localhost', 27017)
-  db = mongo.SculptingVis
-  collection = db[settings.MONGO_DBNAME]
-  collection.update({'uuid': uuid}, {'$set': {"hidden": True}})
-  f = open(settings.ARTIFACTS + '/' + uuid + '/artifact.json', 'r')
-  j = json.load(f)
-  j['hidden'] = True
-  f = open(settings.ARTIFACTS + '/' + uuid + '/artifact.json', 'w')
-  json.dump(j,f)
+  try:
+    mongo = MongoClient('localhost', 27017)
+    db = mongo.SculptingVis
+    collection = db[settings.MONGO_DBNAME]
+    collection.update_one({'uuid': uuid}, {'$set': {"hidden": True}})
+    with open(settings.ARTIFACTS + '/' + uuid + '/artifact.json', 'r') as f:
+      j = json.load(f)
+    j['hidden'] = True
+    with open(settings.ARTIFACTS + '/' + uuid + '/artifact.json', 'w') as f:
+      json.dump(j,f)
+  except Exception as e:
+    print('Failed to hide artifact', e)
+    return HttpResponse('Failed to hide artifact', 500)
   return HttpResponse("OK")
 
 def copyArtifactLocal(request, path, uuid):

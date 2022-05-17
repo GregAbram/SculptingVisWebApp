@@ -93,8 +93,11 @@ input#id_family, input#id_clss {
   margin: 0;
 }
 
-/* Crop masks */
-
+/* Crop masks
+ * Background repeats 17 times left-to-right and bottom-to-top.
+ * So, there are 8 patterns on each side + the one in the middle.
+ * Hence the 1/8 and 1/17 fractions for background size...
+ */
 .crop-mask {
   filter: brightness(70%);
   position: absolute;
@@ -102,30 +105,30 @@ input#id_family, input#id_clss {
   z-index: 0;
 }
 .crop-mask.left {
-  left: -200%;
+  left: -800%;
   height: 100%;
-  width: 200%;
-  background-size: 50% 100%;
+  width: 800%;
+  background-size: 12.5% 100%;
 }
 .crop-mask.right {
   left: 100%;
   height: 100%;
-  width: 200%;
-  background-size: 50% 100%;
+  width: 800%;
+  background-size: 12.5% 100%;
 }
 .crop-mask.top {
-  top: -200%;
-  left: -200%;
-  height: 200%;
-  width: 500%;
-  background-size: 20% 50%;
+  top: -800%;
+  left: -800%;
+  height: 800%;
+  width: 1700%;
+  background-size: 5.8823529% 12.5%;
 }
 .crop-mask.bottom {
   top: 100%;
-  left: -200%;
-  height: 200%;
-  width: 500%;
-  background-size: 20% 50%;
+  left: -800%;
+  height: 800%;
+  width: 1700%;
+  background-size: 5.8823529% 12.5%;
 }
 
 .resize-handle {

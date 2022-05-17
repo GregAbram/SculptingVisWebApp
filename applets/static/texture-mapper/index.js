@@ -82,7 +82,7 @@ function setup() {
     {
       let imageData = getCroppedImageData(i, 'imgData');
 
-      name = 'texturemap_' + i;
+      let name = 'texturemap_' + i;
       names.push(name);
 
       fd.append(name + '_size', new Blob([JSON.stringify({'width': imageData.width, 'height': imageData.height})], {type: "text"}));
@@ -94,7 +94,7 @@ function setup() {
     {
       let imageData = getCroppedImageData(i, 'normalMaps');
 
-      name = 'normalmap_' + i;
+      let name = 'normalmap_' + i;
       names.push(name);
 
       fd.append(name + '_size', new Blob([JSON.stringify({'width': imageData.width, 'height': imageData.height})], {type: "text"}));
