@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -146,3 +147,5 @@ XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
 
 ARTIFACTS = STATIC_ROOT + '/Artifacts'
 MONGO_DBNAME = 'curated'
+MONGO_HOST = os.environ.get('MONGO_HOST', 'localhost')
+STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'

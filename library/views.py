@@ -23,7 +23,7 @@ def artifact_name(i):
 
 def hideArtifact(request, uuid):
   try:
-    mongo = MongoClient('localhost', 27017)
+    mongo = MongoClient(os.environ.get('MONGO_HOST', 'localhost'), 27017)
     db = mongo.SculptingVis
     collection = db[settings.MONGO_DBNAME]
     collection.update_one({'uuid': uuid}, {'$set': {"hidden": True}})
@@ -46,7 +46,7 @@ def copyArtifactLocal(request, path, uuid):
     return HttpResponse("copy failed")
 
 def pullFromRemoteLibrary(request, host, uuid):
-  mongo = MongoClient('localhost', 27017)
+  mongo = MongoClient(os.environ.get('MONGO_HOST', 'localhost'), 27017)
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
   members = list(collection.find({'uuid': uuid}))
@@ -99,7 +99,7 @@ def upload_cmap(request):
 
 def show(request):
   request.session['selections'] = []
-  mongo = MongoClient('localhost', 27017)
+  mongo = MongoClient(os.environ.get('MONGO_HOST', 'localhost'), 27017)
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
   types = ['colormap', 'texture'] + collection.distinct('type')
@@ -107,7 +107,7 @@ def show(request):
   return render(request, 'library/browser.html', params)
 
 def showtype(request, typ):
-  mongo = MongoClient('localhost', 27017)
+  mongo = MongoClient(os.environ.get('MONGO_HOST', 'localhost'), 27017)
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
   tags = collection.distinct('tags')
@@ -133,7 +133,7 @@ def showtype(request, typ):
   return render(request, 'library/grid.html', params)
 
 def showtypefam(request, typ, fam):
-  mongo = MongoClient('localhost', 27017)
+  mongo = MongoClient(os.environ.get('MONGO_HOST', 'localhost'), 27017)
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
   classes = collection.find({'type': typ, 'hidden': False}).distinct('class')
@@ -159,7 +159,7 @@ def showtypefam(request, typ, fam):
   return render(request, 'library/grid.html', params)
 
 def showtypeclass(request, typ, clss):
-  mongo = MongoClient('localhost', 27017)
+  mongo = MongoClient(os.environ.get('MONGO_HOST', 'localhost'), 27017)
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
   families = collection.find({'type': typ, 'hidden': False}).distinct('family')
@@ -187,7 +187,7 @@ def showtypeclass(request, typ, clss):
 
 def deleteselectedartifacts(request, uuids):
   uuids = uuids.split(',')
-  mongo = MongoClient('localhost', 27017)
+  mongo = MongoClient(os.environ.get('MONGO_HOST', 'localhost'), 27017)
   db = mongo.SculptingVis
   collection = db[settings.MONGO_DBNAME]
   trashdir = settings.BASE_DIR + '/trash'

@@ -77,7 +77,7 @@ def upload_glyph(request):
     f = open(dirname + '/artifact.json', 'w')
     f.write(json.dumps(a, sort_keys=True, indent=4))
     f.close()
-    mongo = MongoClient('localhost', 27017)
+    mongo = MongoClient(os.environ.get('MONGO_HOST', 'localhost'), 27017)
     db = mongo.SculptingVis
     collection = db[settings.MONGO_DBNAME]
     collection.insert_one(a)
@@ -113,7 +113,7 @@ def upload_color_loom(request):
     f = open(dirname + 'artifact.json', 'w')
     f.write(json.dumps(a, sort_keys=True, indent=4))
     f.close()
-    mongo = MongoClient('localhost', 27017)
+    mongo = MongoClient(os.environ.get('MONGO_HOST', 'localhost'), 27017)
     db = mongo.SculptingVis
     collection = db[settings.MONGO_DBNAME]
     collection.insert_one(a)
@@ -154,7 +154,7 @@ def upload_infinite_line(request):
     f = open(dirname + 'artifact.json', 'w')
     f.write(json.dumps(a, sort_keys=True, indent=4))
     f.close()
-    mongo = MongoClient('localhost', 27017)
+    mongo = MongoClient(os.environ.get('MONGO_HOST', 'localhost'), 27017)
     db = mongo.SculptingVis
     collection = db[settings.MONGO_DBNAME]
     collection.insert_one(a)
@@ -198,7 +198,7 @@ def upload_texture_looper(request):
     f.write(json.dumps(a, sort_keys=True, indent=4))
     f.close()
 
-    mongo = MongoClient('localhost', 27017)
+    mongo = MongoClient(os.environ.get('MONGO_HOST', 'localhost'), 27017)
     db = mongo.SculptingVis
     collection = db[settings.MONGO_DBNAME]
     collection.insert_one(a)
@@ -217,7 +217,7 @@ class UploadFormView(FormView):
     object_family = form.data['family']
     object_class = form.data['clss']
     doc = {'type': object_type, 'family': object_family, 'class': object_class}
-    mongo = MongoClient('localhost', 27017)
+    mongo = MongoClient(os.environ.get('MONGO_HOST', 'localhost'), 27017)
     db = mongo.SculptingVis
     collection = db[settings.MONGO_DBNAME]
     collection.insert_one(doc)
