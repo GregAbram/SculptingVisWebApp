@@ -14,7 +14,7 @@ export var wasm = null;
 export var wasm_pkg = null;
 
 export async function importWasm() {
-  wasm_pkg = await import('https://cdn.jsdelivr.net/gh/bridger-herman/texture-looper@master/pkg/texture_looper.js')
+  wasm_pkg = await import('/static/texture_looper.js')
   // First up we need to actually load the wasm file, so we use the
   // default export to inform it where the wasm file is located on the
   // server, and then we wait on the returned promise to wait for the
@@ -25,6 +25,6 @@ export async function importWasm() {
   // Also note that the promise, when resolved, yields the wasm module's
   // exports which is the same as importing the `*_bg` module in other
   // modes
-  wasm = await wasm_pkg.default('https://cdn.jsdelivr.net/gh/bridger-herman/texture-looper@master/pkg/texture_looper_bg.wasm');
+  wasm = await wasm_pkg.default('/static/texture_looper_bg.wasm');
   console.log('wasm initialized');
 }
