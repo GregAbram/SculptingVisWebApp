@@ -8,6 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # ── System packages ────────────────────────────────────────────────────────────
 RUN apt-get update && apt-get install -y --no-install-recommends \
+	vim \
         python3 \
         python3-pip \
         python3-venv \
@@ -35,7 +36,8 @@ COPY . /app/
 
 # Create dirs that settings.py expects
 RUN mkdir -p /var/www/static/Artifacts \
-             /var/log
+             /var/log \
+             /data
 
 # ── Static files ───────────────────────────────────────────────────────────────
 # collectstatic needs DJANGO_SETTINGS_MODULE and a writable STATIC_ROOT

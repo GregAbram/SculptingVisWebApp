@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.forms import Form
 from django.views.generic.edit import FormView
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 import json, pdb, os, sys
 import numpy as np
@@ -15,14 +16,17 @@ import subprocess
 
 from .forms import UploadForm
 
+@login_required
 def applets(request):
   return render(request, 'applets/applets.html', {})
 
+@login_required
 def load_applet(request, applet):
   template = 'applets/' + applet + '.html'
   uploadForm = UploadForm()
   return render(request, template, {'uploadForm': uploadForm})
 
+@login_required
 def upload_glyph(request):
   if request.method == 'POST':
     form = Form(request.POST, request.FILES)
@@ -83,6 +87,7 @@ def upload_glyph(request):
     collection.insert_one(a)
   return HttpResponse('OK')
 
+@login_required
 def upload_color_loom(request):
   if request.method == 'POST':
     form = Form(request.POST, request.FILES)
@@ -120,6 +125,7 @@ def upload_color_loom(request):
 
   return HttpResponse('OK')
 
+@login_required
 def upload_infinite_line(request):
   if request.method == 'POST':
     form = Form(request.POST, request.FILES)
@@ -161,6 +167,7 @@ def upload_infinite_line(request):
 
   return HttpResponse('OK')
 
+@login_required
 def upload_texture_looper(request):
   if request.method == 'POST':
     form = Form(request.POST, request.FILES)

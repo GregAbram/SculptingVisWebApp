@@ -1,4 +1,4 @@
-import sys
+import sys, os
 import shutil
 from uuid import uuid1
 from django.views.generic.edit import FormView

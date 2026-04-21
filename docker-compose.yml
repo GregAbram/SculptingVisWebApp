@@ -1,0 +1,30 @@
+services:
+
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    # Only expose on localhost — the app talks to mongo:27017 internally
+    ports:
+      - "127.0.0.1:27017:27017"
+
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Override the MongoDB host so the app reaches the mongo service
+      MONGO_HOST: mongo
+    depends_on:
+      - mongo
+    volumes:
+      # Persist uploaded artifacts and the SQLite DB across restarts
+      - artifacts:/var/www/static/Artifacts
+      - sqlite:/data
+      
+volumes:
+  mongo_data:
+  artifacts:
+  sqlite:
