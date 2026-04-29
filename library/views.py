@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.text import slugify
 from django.conf import settings
+from django.views.decorators.cache import never_cache
 
 from wsgiref.util import FileWrapper
 
@@ -198,6 +199,7 @@ def deleteselectedartifacts(request, uuids):
     shutil.move(settings.ARTIFACTS + '/' + uuid, trashdir)
   return HttpResponse('OK')
 
+@never_cache
 def library(request):
   if request.META['SERVER_NAME'] == 'localhost' or request.META['SERVER_NAME'] == '127.0.0.1':
     local = True
@@ -225,7 +227,6 @@ def downloadselection(request, uuids):
   return FileResponse(file, as_attachment=True, filename='SculptingVis.tgz')
 
 def downloadartifact(request, uuid):
-  print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
   with open(settings.ARTIFACTS + '/' + uuid + '/artifact.json') as f:
     desc = json.load(f)
   typ = desc['type']
