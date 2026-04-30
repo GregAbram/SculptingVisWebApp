@@ -3,4 +3,4 @@ from django.views.decorators.cache import never_cache
 
 @never_cache
 def applets(request):
-  return render(request, 'index.html', {})
+    return render(request, 'index.html', {})
