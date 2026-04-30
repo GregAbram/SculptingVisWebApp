@@ -9,7 +9,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <base href="/">
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="{% static 'w3.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'glyph-aligner/style.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'spinner.css' %}">
 </head>
@@ -105,7 +105,7 @@
     </div>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
 
   <script src="{% static 'glyph-aligner/three.min.js' %}"></script>
   <script src="{% static 'glyph-aligner/OrbitControls.js' %}"></script>

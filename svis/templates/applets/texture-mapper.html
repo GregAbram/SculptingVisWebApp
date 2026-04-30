@@ -9,11 +9,11 @@
     <title>Texture Mapper</title>
 
     <base href="/">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.2.0/jszip.min.js"> </script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="{% static 'texture-mapper/jquery-ui-1.12.1.custom/external/jquery/jquery.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'w3.css' %}">
+
+    <script src="{% static 'vendor/jszip-3.2.0.min.js' %}"></script>
+    <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
+    <!-- jquery-ui-1.12.1.custom/external/jquery/jquery.js removed: jQuery already loaded above -->
     <script src="{% static 'texture-mapper/jquery-ui-1.12.1.custom/jquery-ui.js' %}"></script>
     <script src="{% static 'texture-mapper/index.js' %}" type="module"></script>
     
