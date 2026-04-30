@@ -2,9 +2,6 @@ from django.urls import include, path
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.auth import views as auth_views
-from django.views.decorators.csrf import csrf_exempt
-from csp.views import report as csp_report
-
 from . import views
 
 urlpatterns = [
@@ -14,5 +11,5 @@ urlpatterns = [
     path('library/', include('library.urls')),
     path('applets/', include('applets.urls')),
     path('admin/', admin.site.urls),
-    path('csp-report/', csrf_exempt(csp_report), name='csp-report'),
+    path('csp-report/', views.csp_report, name='csp-report'),
 ] + staticfiles_urlpatterns()
