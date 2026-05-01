@@ -6,3 +6,7 @@ canvas {
   display: block;
 }
 
+/* Phase D: extracted from inline style attributes */
+#UploadDialog { z-index: 1; }
+#webcamWindow { position: absolute; z-index: 1; top: 50%; left: 40%; }
+

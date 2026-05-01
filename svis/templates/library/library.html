@@ -33,7 +33,7 @@
 {% if islocal == True %}
       <div id=exportZone ondrop="exportArtifact(event)" ondragover="allowDropArtifact(event)"><small>
 	<div>Export Zone</div>
-	<table style='width: 100%'>
+	<table>
 	  <tr>
 	    <td>directory:</td>
 	    <td><input id='dropDir' type='text' value='(required)'></td>
@@ -47,7 +47,7 @@
     </options>
   </titlebar>
 
-<div name='grid' style="height: 100%; overflow: auto;" ondrop="dropArtifact(event)" ondragover="allowDropArtifact(event)"></div>
+<div name='grid' ondrop="dropArtifact(event)" ondragover="allowDropArtifact(event)"></div>
 
 <div class=download ondrop="downloadArtifact(event)" ondragover="allowDropArtifact(event)">
   <img src="{% static "download.png" %}" alt="trash" height="75" width="75">

@@ -213,3 +213,6 @@ input#id_family, input#id_clss {
   width: 40%;
   height: auto;
 }
+
+/* Phase D: extracted from inline style attributes */
+#webcamWindowHeader { position: absolute; z-index: 1; width: 100%; height: 50px; cursor: move; }

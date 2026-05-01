@@ -1,5 +1,5 @@
 /* Site-wide layout overrides extracted from inline <style> blocks.
-   Loaded by applets.html and index.html. */
+   Loaded by applets.html, index.html, and login.html. */
 
 /* applets.html — applet chooser page */
 h1 { margin: 16px; }
@@ -9,3 +9,8 @@ h1 { margin: 16px; }
     margin: 16px;
     text-align: center;
 }
+
+/* login.html */
+.login-outer { margin-top: 100px; }
+.login-card  { max-width: 400px; margin: auto; }
+.login-error { color: red; }

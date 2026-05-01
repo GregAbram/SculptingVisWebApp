@@ -71,3 +71,7 @@ option {
   margin-bottom: 3px;
   padding-top: 3px;
 }
+
+/* Phase D: extracted from inline style attributes */
+div[name='grid']  { height: 100%; overflow: auto; }
+#exportZone table { width: 100%; }

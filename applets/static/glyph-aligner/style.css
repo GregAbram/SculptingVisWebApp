@@ -69,3 +69,6 @@ button {
   color: #000;
   background-color: lightgrey;
 }
+
+/* Phase D: extracted from inline style attributes */
+#thumbnail_canvas { outline: 2px solid black; }
