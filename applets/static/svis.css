@@ -1,0 +1,11 @@
+/* Site-wide layout overrides extracted from inline <style> blocks.
+   Loaded by applets.html and index.html. */
+
+/* applets.html — applet chooser page */
+h1 { margin: 16px; }
+
+/* index.html — home page */
+.w3-container {
+    margin: 16px;
+    text-align: center;
+}

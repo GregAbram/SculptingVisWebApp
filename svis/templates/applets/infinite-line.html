@@ -25,9 +25,7 @@
       <div id="webcamWindowHeader" style="position: absolute; z-index: 1; width: 100%; height: 50px; cursor: move;"></div>
     </div>
 
-    <script>
-      var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-    </script>
+    <script src="{% static 'csrf-init.js' %}"></script>
     <script src="{% static 'infinite-line/sketch.js' %}"></script> 
     <script src="{% static 'infinite-line/webcamWindow.js' %}"></script> 
   </body>

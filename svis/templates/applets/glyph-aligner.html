@@ -117,10 +117,7 @@
   <script src="{% static 'glyph-aligner/mesh_simplify.js' %}"></script>
   <script src="{% static 'glyph-aligner/OBJLoader.js' %}"></script>
 
-  <script>
-    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-  </script>
-
+  <script src="{% static 'csrf-init.js' %}"></script>
 
   <script id="template" type="notjs">
     <div class="scene"></div>

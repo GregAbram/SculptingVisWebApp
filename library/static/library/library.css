@@ -1,0 +1,73 @@
+/* Library page styles extracted from inline <style> block in library.html.
+   The islocal Django conditional is handled via options.local-mode / options.remote-mode
+   classes set on the <options> element in the template. */
+
+h1,h2,h3,h4,h5,h6 { font-family: "Lato", sans-serif; }
+.w3-bar,h1,button { font-family: "Montserrat", sans-serif; }
+
+.fa-anchor,.fa-coffee { font-size: 200px; }
+
+html {
+    background-color: #A1998F;
+}
+
+div table tbody tr td {
+    background-color: #A1998F;
+}
+
+body {
+    background-color: #A1998F;
+    height: 100%;
+}
+
+#exportZone {
+  text-align: center;
+  vertical-align: middle;
+  height: 100%;
+  width: 100%;
+}
+
+.download {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  left: 0;
+}
+
+.trash {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  right: 0;
+}
+
+titlebar {
+  display: grid;
+  padding-top: 10px;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  border-bottom: 1px solid black;
+}
+
+pagename {
+  grid-column: 1;
+  font-size: xx-large;
+}
+
+options {
+  grid-column: 2;
+  display: grid;
+  justify-self: right;
+}
+
+/* Set by Django template via class attribute on <options> */
+options.local-mode  { grid-template-columns: repeat(5, 1fr); }
+options.remote-mode { grid-template-columns: repeat(4, 1fr); }
+
+option {
+  text-transform: uppercase;
+  justify-self: center;
+  align-self: end;
+  margin-bottom: 3px;
+  padding-top: 3px;
+}
